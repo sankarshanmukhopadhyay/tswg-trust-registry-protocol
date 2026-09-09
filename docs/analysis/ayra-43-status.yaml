@@ -1,0 +1,32 @@
+source:
+  repository: ayraforum/ayra-trust-registry-resources
+  issue: 43
+  observed_at: 2026-09-09
+
+change:
+  type: governance
+  scope: trqp-verification-material
+  breaking: possible
+  authority_impact: material
+  assurance_impact: material
+
+candidate:
+  state: needs_judgment
+  impact: very_high
+  evidence_state: partially_verified
+
+propositions:
+  principal_material_separation: pending
+  critical_qualifier_safety: pending
+  explicit_indeterminacy: pending
+  historical_binding: pending
+
+upstream_trqp:
+  status: pending
+  issues: []
+  rule: add upstream TRQP issue references when available and treat them as authoritative normative disposition
+
+execution:
+  tspp: pending
+  interop_lab_case: IC-TRQP-PKI-001
+  tsms: deferred_until_generic_semantics_clear
