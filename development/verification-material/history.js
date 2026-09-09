@@ -1,0 +1,95 @@
+'use strict';
+
+const HISTORICAL_DECISIONS = Object.freeze({
+  POSITIVE: 'positive',
+  AUTHORITATIVE_NEGATIVE: 'authoritative-negative',
+  INDETERMINATE: 'indeterminate'
+});
+
+const HISTORICAL_REASONS = Object.freeze({
+  STATE_ESTABLISHED: 'historical-state-established',
+  STATE_NEGATIVE: 'historical-state-negative',
+  NO_COVERING_EVIDENCE: 'no-covering-historical-evidence',
+  CONFLICTING_EVIDENCE: 'conflicting-historical-evidence',
+  NON_AUTHORITATIVE: 'historical-source-non-authoritative',
+  INCOMPLETE: 'historical-source-incomplete'
+});
+
+const HISTORICAL_STATES = Object.freeze({
+  VALID: 'valid',
+  REVOKED: 'revoked',
+  EXPIRED: 'expired',
+  SUPERSEDED: 'superseded',
+  NOT_APPLICABLE: 'not-applicable'
+});
+
+function parseTime(value, field) {
+  if (typeof value !== 'string' || value.trim() === '') throw new TypeError(`${field} must be a non-empty RFC3339-compatible date-time string`);
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) throw new TypeError(`${field} must be an RFC3339-compatible date-time string`);
+  return parsed;
+}
+
+function createHistoricalAssertion(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new TypeError('historical assertion must be an object');
+  if (!Object.values(HISTORICAL_STATES).includes(input.state)) throw new TypeError(`unsupported historical state: ${input.state}`);
+  const from = parseTime(input.effective_from, 'effective_from');
+  const until = input.effective_until ? parseTime(input.effective_until, 'effective_until') : undefined;
+  if (until && until <= from) throw new TypeError('effective_until must be later than effective_from');
+  return Object.freeze({
+    verification_material_id: input.verification_material_id,
+    state: input.state,
+    effective_from: from.toISOString(),
+    ...(until ? { effective_until: until.toISOString() } : {}),
+    source_id: input.source_id,
+    authoritative: input.authoritative === true,
+    complete_for_scope: input.complete_for_scope === true,
+    ...(input.evidence_digest ? { evidence_digest: input.evidence_digest } : {})
+  });
+}
+
+function covers(assertion, at) {
+  const t = parseTime(at, 'evaluation_time');
+  const from = new Date(assertion.effective_from);
+  const until = assertion.effective_until ? new Date(assertion.effective_until) : undefined;
+  return t >= from && (!until || t < until);
+}
+
+function evaluateHistoricalMaterial(materialId, assertions, at) {
+  if (typeof materialId !== 'string' || materialId.trim() === '') throw new TypeError('verification_material_id must be a non-empty string');
+  if (!Array.isArray(assertions)) throw new TypeError('assertions must be an array');
+  const evaluation = parseTime(at, 'evaluation_time');
+  const normalized = assertions.map(createHistoricalAssertion).filter((entry) => entry.verification_material_id === materialId);
+  const covering = normalized.filter((entry) => covers(entry, evaluation.toISOString()));
+
+  if (covering.length === 0) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.NO_COVERING_EVIDENCE, materialId, evaluation, []);
+  if (covering.some((entry) => !entry.authoritative)) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.NON_AUTHORITATIVE, materialId, evaluation, covering);
+  if (covering.some((entry) => !entry.complete_for_scope)) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.INCOMPLETE, materialId, evaluation, covering);
+
+  const states = [...new Set(covering.map((entry) => entry.state))];
+  if (states.length !== 1) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.CONFLICTING_EVIDENCE, materialId, evaluation, covering);
+
+  if (states[0] === HISTORICAL_STATES.VALID) {
+    return result(HISTORICAL_DECISIONS.POSITIVE, HISTORICAL_REASONS.STATE_ESTABLISHED, materialId, evaluation, covering, states[0]);
+  }
+  return result(HISTORICAL_DECISIONS.AUTHORITATIVE_NEGATIVE, HISTORICAL_REASONS.STATE_NEGATIVE, materialId, evaluation, covering, states[0]);
+}
+
+function result(decision, reason, materialId, evaluation, evidence, state) {
+  return Object.freeze({
+    verification_material_id: materialId,
+    evaluation_time: evaluation.toISOString(),
+    decision,
+    reason,
+    ...(state ? { historical_state: state } : {}),
+    evidence: Object.freeze(evidence)
+  });
+}
+
+module.exports = {
+  HISTORICAL_DECISIONS,
+  HISTORICAL_REASONS,
+  HISTORICAL_STATES,
+  createHistoricalAssertion,
+  evaluateHistoricalMaterial
+};
