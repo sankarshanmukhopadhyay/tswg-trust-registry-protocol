@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - 'feat/verification-material-reference'
+      - 'feat/wp*'
+      - 'test/wp*'
   pull_request:
   workflow_dispatch:
 
