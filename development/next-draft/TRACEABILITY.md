@@ -1,0 +1,37 @@
+# Candidate Next TRQP — Traceability Register
+
+Status: **downstream experimental / non-normative**  
+Plan: https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/blob/draft/next-trqp/development/next-draft/NEXT-DRAFT-PLAN.md
+
+This register prevents candidate specification language from becoming detached from authority, implementation evidence, and falsification results.
+
+## Status vocabulary
+
+- `identified` — requirement/question has a source but no executable evidence yet;
+- `implemented` — downstream reference behaviour exists;
+- `tested` — focused executable tests exist;
+- `interop-pending` — repository-local evidence exists but independent interoperability evidence does not;
+- `candidate-text` — evidence is sufficient to draft non-normative candidate specification language;
+- `upstream-reconciled` — relevant upstream disposition has been evaluated;
+- `blocked` — evidence or authority gap prevents advancement.
+
+## Register
+
+| ID | Candidate proposition | Upstream / external provenance | Implementation evidence | Falsification / assurance evidence | State |
+| --- | --- | --- | --- | --- | --- |
+| NTRQP-001 | Principal identity and independently governed verification material must not be implicitly conflated when the trust proposition is about the principal. | https://github.com/trustoverip/tswg-trust-registry-protocol/issues/194 ; https://github.com/ayraforum/ayra-trust-registry-resources/issues/43 ; https://trustoverip.github.io/high-assurance-verifiable-identifiers/ | https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/blob/feat/verification-material-reference/development/verification-material/model.js | https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/blob/feat/verification-material-reference/tests/wp1-principal-material-model.test.js | tested / interop-pending |
+| NTRQP-002 | A material-bound authorization must evaluate the exact principal/material/authority/action/resource tuple and must not fall back to principal-only authorization on material mismatch. | https://github.com/ayraforum/ayra-trust-registry-resources/issues/43 ; https://github.com/trustoverip/tswg-trust-registry-protocol/issues/194 | https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/blob/feat/verification-material-reference/development/verification-material/evaluator.js | https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/blob/feat/verification-material-reference/tests/wp2-material-bound-evaluation.test.js ; https://github.com/sankarshanmukhopadhyay/trust-protocol-interop-lab/issues/205 | tested / interop-pending |
+| NTRQP-003 | An unsupported decision-critical query condition must not be silently ignored in a way that broadens the evaluated proposition and permits a false positive. | https://github.com/ayraforum/ayra-trust-registry-resources/issues/43 ; current TRQP v2 extension semantics characterized at https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/blob/feat/verification-material-reference/development/verification-material/WP0-baseline.md | WP3 pending under https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/issues/1 | https://github.com/sankarshanmukhopadhyay/trust-protocol-interop-lab/issues/205 | identified |
+| NTRQP-004 | Lifecycle state and evaluation time must be deterministic enough to distinguish current, revoked, expired, superseded and historical material-bound propositions. | https://github.com/trustoverip/tswg-trust-registry-protocol/issues/176 ; https://github.com/trustoverip/tswg-trust-registry-protocol/issues/194 ; https://github.com/ayraforum/ayra-trust-registry-resources/issues/43 | WP4/WP6 pending under https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/issues/1 | https://github.com/sankarshanmukhopadhyay/TRQP-TSPP/issues/79 ; https://github.com/sankarshanmukhopadhyay/trust-protocol-interop-lab/issues/205 | identified |
+| NTRQP-005 | Authoritative negative evidence must remain distinguishable from absence in incomplete/unknown sources and from stale/insufficient evidence. | https://github.com/ayraforum/ayra-trust-registry-resources/issues/43 | WP5 pending under https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/issues/1 | https://github.com/sankarshanmukhopadhyay/TRQP-TSPP/issues/79 ; https://github.com/sankarshanmukhopadhyay/trust-protocol-interop-lab/issues/205 | identified |
+| NTRQP-006 | Core query semantics should remain transport-independent while HTTPS/REST remains a defined binding. | https://github.com/trustoverip/tswg-trust-registry-protocol/issues/178 | none yet | none yet | identified |
+| NTRQP-007 | Endpoint/capability discovery should be specified separately from the meaning of authorization/recognition decisions. | https://github.com/trustoverip/tswg-trust-registry-protocol/issues/177 | none yet | none yet | identified |
+| NTRQP-008 | Governance and security assurance profiles may strengthen metadata/security posture without silently redefining the core trust proposition. | https://github.com/trustoverip/tswg-trust-registry-protocol/issues/181 ; https://github.com/trustoverip/tswg-trust-registry-protocol/issues/183 | none yet | none yet | identified |
+| NTRQP-009 | Recognition semantics require explicit relationship/evidence/lifecycle rules; transitivity must not be assumed merely from graph connectivity. | https://github.com/trustoverip/tswg-trust-registry-protocol/issues/182 | none yet | none yet | identified |
+| NTRQP-010 | PKI profiles must distinguish authority identity, semantic principal identity, certificate/key identity, registry/source identity, and endpoint location. | https://github.com/trustoverip/tswg-trust-registry-protocol/issues/194 ; https://github.com/ayraforum/ayra-trust-registry-resources/issues/43 | WP1/WP2 evidence under https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/issues/1 | https://github.com/sankarshanmukhopadhyay/trust-protocol-interop-lab/issues/205 | implemented / interop-pending |
+
+## Evidence rule
+
+A row MUST NOT advance to `candidate-text` solely because an upstream issue proposes the feature. For behavioural requirements, implementation and falsification evidence are expected unless the proposition is intentionally informative/non-executable.
+
+When new upstream TRQP issues become available, add their full URLs to the relevant provenance cells and reconcile their disposition before treating downstream candidate text as stable.
