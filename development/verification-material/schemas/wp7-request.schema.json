@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/trqp/wp7-request.schema.json",
+  "title": "Downstream candidate TRQP qualified request",
+  "type": "object",
+  "required": ["trqp_version", "entity_id", "authority_id", "action", "resource"],
+  "properties": {
+    "trqp_version": { "const": "3.0-candidate" },
+    "entity_id": { "type": "string", "minLength": 1 },
+    "authority_id": { "type": "string", "minLength": 1 },
+    "action": { "type": "string", "minLength": 1 },
+    "resource": { "type": "string", "minLength": 1 },
+    "context": {
+      "type": "object",
+      "properties": {
+        "time": { "type": "string", "format": "date-time" },
+        "verification_material": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "critical_context": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "required_profiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "additionalProperties": false
+}
