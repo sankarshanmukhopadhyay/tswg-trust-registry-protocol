@@ -55,7 +55,7 @@ test('required profile fails closed when endpoint does not advertise support', (
   assert.equal(result.reason, REASONS.REQUIRED_PROFILE_UNSUPPORTED);
 });
 
-test('profile negotiation alone is insufficient unless the profile guarantees context processing', () => {
+test('profile identifier without a processing contract fails closed', () => {
   const result = evaluateCompatibility({
     ...base,
     context: { verification_material: 'urn:sha256:c2' },
@@ -64,10 +64,41 @@ test('profile negotiation alone is insufficient unless the profile guarantees co
     supported_context: ['time'],
     supported_profiles: ['verification-material-v1']
   });
+  assert.equal(result.decision, DECISIONS.INDETERMINATE);
+  assert.equal(result.reason, REASONS.PROFILE_CONTRACT_UNSATISFIED);
+});
+
+test('profile contract fails closed when mandatory qualifier processing is unavailable', () => {
+  const result = evaluateCompatibility({
+    ...base,
+    context: { verification_material: 'urn:sha256:c2' },
+    required_profiles: ['verification-material-v1']
+  }, {
+    supported_context: ['time'],
+    supported_profiles: ['verification-material-v1'],
+    profile_contracts: {
+      'verification-material-v1': { required_context: ['verification_material'] }
+    }
+  });
+  assert.equal(result.decision, DECISIONS.INDETERMINATE);
+  assert.equal(result.reason, REASONS.PROFILE_CONTRACT_UNSATISFIED);
+  assert.deepEqual(result.missing_required_context, ['verification_material']);
+});
+
+test('pre-negotiated profile processes all mandatory qualifiers', () => {
+  const result = evaluateCompatibility({
+    ...base,
+    context: { verification_material: 'urn:sha256:c2' },
+    required_profiles: ['verification-material-v1']
+  }, {
+    supported_context: ['time', 'verification_material'],
+    supported_profiles: ['verification-material-v1'],
+    profile_contracts: {
+      'verification-material-v1': { required_context: ['verification_material'] }
+    }
+  });
   assert.equal(result.decision, DECISIONS.PROCESSED);
-  assert.equal(Object.hasOwn(result.context, 'verification_material'), false);
-  // This is deliberate evidence: merely naming a profile does not mechanically
-  // prevent silent qualifier loss. The profile contract must bind supported context.
+  assert.equal(result.context.verification_material, 'urn:sha256:c2');
 });
 
 test('critical declaration must refer to an actual context member', () => {
