@@ -1,6 +1,6 @@
 # WP7 — Candidate wire semantics and TRQP v2 compatibility boundary
 
-Status: **baseline established; wire experiments next**
+Status: **repository-local falsification complete; candidate semantics remain experimental**
 
 Tracker:
 https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/issues/4
@@ -26,66 +26,69 @@ However, WP6 demonstrates that historical correctness depends on the evidence mo
 
 ## Finding 2 — the current extensibility rule is unsafe for decision-critical qualifiers
 
-Approved TRQP v2 says that:
+Approved TRQP v2 requires an endpoint receiving an unrecognized context member to ignore it and process the query using supported members. That is safe only when omission cannot change the proposition being evaluated.
 
-1. `context` is the primary extensibility mechanism;
-2. profiles/bindings may define additional context members;
-3. an endpoint receiving an unrecognized context member **MUST ignore it and process the query using supported members**;
-4. implementations within a major version must accept minor-version queries while ignoring unrecognized optional fields.
+WP2/WP3 show that `verification_material` is decision-critical. If a v2 endpoint ignores it, the endpoint can answer whether the principal is authorized generally rather than whether the principal using the specified material is authorized. The positive response is then a false positive for the proposition actually asked.
 
-That processing rule is safe only for conditions whose omission cannot change the proposition being evaluated.
+## Finding 3 — a profile identifier is not a processing contract
 
-WP2/WP3 show that `verification_material` is not such a condition. If a consumer asks:
+WP7 now falsifies a profile-name-only approach. Advertising `verification-material-v1` is insufficient unless the endpoint also binds that profile to mandatory context processing. The reference experiment therefore treats a required profile without an explicit processing contract as `indeterminate` with reason `profile-contract-unsatisfied`.
 
-```json
-{
-  "entity_id": "did:example:issuer-a",
-  "authority_id": "did:example:authority",
-  "action": "issue",
-  "resource": "credential-type-x",
-  "context": {
-    "verification_material": "urn:sha256:c2"
-  }
-}
-```
+A pre-negotiated profile is viable only when all of the following are established before authoritative query processing:
 
-and a v2 endpoint ignores `verification_material`, it may answer whether the principal is authorized generally rather than whether **that principal using C2** is authorized. A positive response is therefore a false positive for the proposition actually asked.
+1. the endpoint supports the named profile;
+2. the profile contract identifies its mandatory context members;
+3. the endpoint supports every mandatory context member supplied by the request;
+4. generic legacy peers are excluded from the qualified exchange;
+5. failure of any capability condition returns indeterminate rather than silently broadening the proposition.
+
+This can be useful as a transitional deployment profile, but it is not transparent compatibility with generic TRQP v2.
+
+## Finding 4 — response reasons are decision-class constrained
+
+The candidate response vocabulary distinguishes three decision classes and prevents reasons from drifting between them.
+
+- `positive`: `evidence-supports-proposition`.
+- `authoritative-negative`: `not-listed`, `not-applicable`, `revoked`, `expired`, `superseded`, `wrong-purpose`, `wrong-resource`, `material-mismatch`.
+- `indeterminate`: `evidence-incomplete`, `evidence-stale`, `evidence-unavailable`, `historical-evidence-incomplete`, `unsupported-critical-context`, `required-profile-unsupported`, `profile-contract-unsatisfied`, `conflicting-evidence`.
+
+The distinction is intentional: `not-applicable` is not `not-listed`; stale or incomplete evidence is not an authoritative denial; unsupported critical semantics cannot be converted into a broader successful evaluation.
 
 ## Compatibility classification
 
-| Candidate semantic | Initial classification | Rationale |
+| Candidate semantic | Final WP7 classification | Rationale |
 | --- | --- | --- |
-| `context.time` syntax | v2-compatible | Already represented by approved v2. |
-| Historical evidence sufficiency | breaking-processing-semantics unless negotiated | Existing syntax does not guarantee historical evidence capability. |
-| Verification-material qualifier | breaking-processing-semantics | v2 requires unknown context members to be ignored. |
-| Evidence/provenance response metadata | potentially v2-compatible-informative | Optional response metadata can be additive if it does not redefine `authorized`/`recognized`. |
-| Positive / authoritative-negative / indeterminate distinction | likely new-version/profile processing contract | Existing booleans cannot safely encode indeterminate without an explicit contract. |
-| Unsupported-critical-condition outcome | new processing requirement | v2 currently mandates ignore-and-process. |
-| Source authority/completeness/freshness diagnostics | potentially v2-compatible-informative | Can be additive, but relying-party semantics may make them decision-critical. |
-
-## Emerging versioning conclusion
-
-The central compatibility problem is not JSON shape. It is **processing semantics**.
-
-Adding `verification_material` as an optional `context` member is syntactically permitted by v2 but semantically unsafe because conforming v2 endpoints are required to ignore an unknown member. Therefore a minor-version addition cannot safely make that member decision-critical under the existing rules.
-
-At least one of the following is required:
-
-1. a new major version that changes unknown-critical-condition processing;
-2. an explicitly negotiated profile/capability whose successful negotiation changes the processing contract and forbids silent fallback;
-3. a generic critical-members mechanism understood by both peers, where unsupported critical members cause a non-success/indeterminate outcome rather than being ignored.
-
-WP7 will implement and falsify options 2 and 3 before recommending whether a major version is unavoidable.
+| `context.time` syntax | `v2-compatible-informative` | Already represented by approved v2. |
+| Historical evidence sufficiency | `breaking-processing-semantics` | Existing syntax does not guarantee authoritative historical evidence. |
+| Verification-material qualifier | `breaking-processing-semantics` | v2 requires unknown context members to be ignored. |
+| Evidence/provenance response metadata | `v2-compatible-informative` only when non-decisional | Additive metadata is safe only if clients do not rely on it to reinterpret a v2 boolean. |
+| Three-state evidence decision | `new-version-required` for generic interoperability | Existing booleans cannot safely encode indeterminate without a new processing contract. |
+| Unsupported-critical-condition outcome | `new-version-required` for generic interoperability | v2 currently mandates ignore-and-process. |
+| Pre-negotiated profile with mandatory context contract | `v2-compatible-profile` only as a bounded transition | Safe only after capability establishment excludes generic legacy peers. |
+| Source authority/completeness/freshness diagnostics | `v2-compatible-informative` as diagnostics; breaking if decisional | Relying-party semantics determine whether they alter the proposition. |
 
 ## Candidate safety invariant
 
 > An implementation MUST NOT return a definitive success for a proposition after silently dropping a query condition that the requester declared decision-critical.
 
-## Next experiments
+## Versioning recommendation
 
-- model a candidate `critical` declaration for context members;
-- model capability/profile negotiation;
-- simulate a conforming v2 endpoint that ignores unknown context;
-- prove downgrade/fallback false positives;
-- determine whether a negotiated v2 profile can fail closed without contradicting v2 conformance;
-- design response evidence that preserves existing booleans only where the decision is definitive.
+WP7's repository-local evidence supports **TRQP 3.0 candidate processing semantics**, not TRQP 2.1, for the decision-critical model developed in WP1–WP7.
+
+The reason is not payload aesthetics. It is a direct processing conflict: approved v2 requires unknown optional context to be ignored, while the candidate assurance model requires unsupported decision-critical context to fail closed as indeterminate. A legacy endpoint can therefore produce a materially broader positive result from the same qualified request.
+
+A tightly controlled v2 profile remains useful for transitional interoperability experiments, but only when capability/profile establishment occurs before the query and the profile mechanically binds mandatory qualifier processing. Such a profile MUST NOT be represented as transparent compatibility with generic v2 endpoints.
+
+## Evidence and remaining authority boundary
+
+Repository-local implementation and tests now cover:
+
+- legacy-v2 qualifier-drop false-positive risk;
+- unsupported critical-context failure;
+- missing and unsupported profile failure;
+- profile-contract binding to mandatory context;
+- explicit candidate-version validation;
+- three-state decision constraints;
+- decision-specific reason vocabulary, including `not-applicable` vs `not-listed`, stale/incomplete evidence, and wrong-purpose/resource/material cases.
+
+This closes the WP7 repository-local question. It does **not** make the candidate normative or stable. WP8 independent Interop Lab/TSPP evidence and later upstream reconciliation remain separate gates before any promotion judgment.
