@@ -8,7 +8,7 @@ const DECISIONS = Object.freeze({
 const REASONS = Object.freeze({
   UNSUPPORTED_CRITICAL_CONTEXT: 'unsupported-critical-context',
   REQUIRED_PROFILE_UNSUPPORTED: 'required-profile-unsupported',
-  PROFILE_NOT_NEGOTIATED: 'profile-not-negotiated',
+  PROFILE_CONTRACT_UNSATISFIED: 'profile-contract-unsatisfied',
   PROCESSED: 'processed'
 });
 
@@ -20,6 +20,21 @@ function normalizeStrings(value, field) {
   return [...new Set(value)];
 }
 
+function normalizeProfileContracts(value) {
+  if (value === undefined) return {};
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new TypeError('profile_contracts must be an object');
+  }
+  return Object.fromEntries(Object.entries(value).map(([profile, contract]) => {
+    if (!contract || typeof contract !== 'object' || Array.isArray(contract)) {
+      throw new TypeError(`profile_contracts.${profile} must be an object`);
+    }
+    return [profile, Object.freeze({
+      required_context: Object.freeze(normalizeStrings(contract.required_context, `profile_contracts.${profile}.required_context`))
+    })];
+  }));
+}
+
 function evaluateCompatibility(request, endpoint) {
   if (!request || typeof request !== 'object') throw new TypeError('request must be an object');
   if (!endpoint || typeof endpoint !== 'object') throw new TypeError('endpoint must be an object');
@@ -29,6 +44,7 @@ function evaluateCompatibility(request, endpoint) {
   const supportedContext = new Set(normalizeStrings(endpoint.supported_context, 'supported_context'));
   const requestedProfiles = normalizeStrings(request.required_profiles, 'required_profiles');
   const supportedProfiles = new Set(normalizeStrings(endpoint.supported_profiles, 'supported_profiles'));
+  const profileContracts = normalizeProfileContracts(endpoint.profile_contracts);
 
   const absentCritical = critical.filter((name) => !Object.hasOwn(context, name));
   if (absentCritical.length) throw new TypeError(`critical context member absent from context: ${absentCritical.join(', ')}`);
@@ -49,6 +65,28 @@ function evaluateCompatibility(request, endpoint) {
       reason: REASONS.REQUIRED_PROFILE_UNSUPPORTED,
       unsupported_profiles: Object.freeze(unsupportedProfiles)
     });
+  }
+
+  for (const profile of requestedProfiles) {
+    const contract = profileContracts[profile];
+    if (!contract) {
+      return Object.freeze({
+        decision: DECISIONS.INDETERMINATE,
+        reason: REASONS.PROFILE_CONTRACT_UNSATISFIED,
+        profile
+      });
+    }
+    const missingRequiredContext = contract.required_context.filter(
+      (name) => !Object.hasOwn(context, name) || !supportedContext.has(name)
+    );
+    if (missingRequiredContext.length) {
+      return Object.freeze({
+        decision: DECISIONS.INDETERMINATE,
+        reason: REASONS.PROFILE_CONTRACT_UNSATISFIED,
+        profile,
+        missing_required_context: Object.freeze(missingRequiredContext)
+      });
+    }
   }
 
   const understoodContext = Object.fromEntries(
