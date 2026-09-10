@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/trqp/wp7-response.schema.json",
+  "title": "Downstream candidate TRQP evidence-aware response",
+  "type": "object",
+  "required": ["decision", "reason", "time_evaluated", "evidence"],
+  "properties": {
+    "authorized": { "type": "boolean" },
+    "recognized": { "type": "boolean" },
+    "decision": {
+      "enum": ["positive", "authoritative-negative", "indeterminate"]
+    },
+    "reason": { "type": "string", "minLength": 1 },
+    "time_requested": { "type": "string", "format": "date-time" },
+    "time_evaluated": { "type": "string", "format": "date-time" },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "authoritative", "complete_for_scope"],
+        "properties": {
+          "source_id": { "type": "string", "minLength": 1 },
+          "authoritative": { "type": "boolean" },
+          "complete_for_scope": { "type": "boolean" },
+          "scope": { "type": "string" },
+          "observed_at": { "type": "string", "format": "date-time" },
+          "effective_from": { "type": "string", "format": "date-time" },
+          "effective_until": { "type": "string", "format": "date-time" },
+          "digest": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "positive" } }, "required": ["decision"] },
+      "then": {
+        "anyOf": [
+          { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
+          { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
+        ]
+      }
+    },
+    {
+      "if": { "properties": { "decision": { "const": "indeterminate" } }, "required": ["decision"] },
+      "then": {
+        "not": {
+          "anyOf": [
+            { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
+            { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}
