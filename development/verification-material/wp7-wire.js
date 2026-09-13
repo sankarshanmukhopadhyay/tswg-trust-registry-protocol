@@ -46,6 +46,10 @@ function evaluateCompatibility(request, endpoint) {
   const supportedProfiles = new Set(normalizeStrings(endpoint.supported_profiles, 'supported_profiles'));
   const profileContracts = normalizeProfileContracts(endpoint.profile_contracts);
 
+  if (Object.hasOwn(context, 'verification_material') && !critical.includes('verification_material')) {
+    throw new TypeError('verification_material must be declared in critical_context');
+  }
+
   const absentCritical = critical.filter((name) => !Object.hasOwn(context, name));
   if (absentCritical.length) throw new TypeError(`critical context member absent from context: ${absentCritical.join(', ')}`);
 
