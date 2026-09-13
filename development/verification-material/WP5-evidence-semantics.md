@@ -23,13 +23,13 @@ A missing record is not inherently a negative trust statement. Its meaning depen
 
 Likewise, a listed record is not inherently sufficient for a positive trust statement if the source is non-authoritative or stale.
 
-WP5 therefore introduces a downstream three-way decision model without changing TRQP v2 wire semantics:
+WP5 introduced a downstream three-way evaluator model without changing TRQP v2 wire semantics:
 
 - `positive`;
 - `authoritative-negative`;
 - `indeterminate`.
 
-These are internal reference-model values, not proposed normative response vocabulary.
+Subsequent S21-04 candidate-specification work promotes `not-applicable` to a distinct fourth **wire-level decision class** so clients do not have to infer applicability from a negative result/reason pair. The WP5 evaluator evidence remains valid; the four-class wire vocabulary is defined in `development/next-draft/proposals/S21-04-decision-reason-vocabulary.md`.
 
 ## Evidence-source properties
 
@@ -46,20 +46,20 @@ The evaluator preserves:
 
 ## Decision matrix
 
-| Evidence state | Authoritative | Complete for scope | Fresh | Decision |
-| --- | --- | --- | --- | --- |
-| listed + applicable | yes | either | yes | positive |
-| listed + applicable | no | either | yes | indeterminate |
-| listed + applicable | yes | either | no | indeterminate |
-| not listed | yes | yes | yes | authoritative-negative |
-| not listed | yes | no | yes | indeterminate |
-| not listed | no | either | yes | indeterminate |
-| not listed | yes | yes | no | indeterminate |
-| not applicable | yes | n/a | yes | authoritative-negative / not-applicable |
-| revoked | yes | n/a | yes | authoritative-negative / revoked |
-| expired | yes | n/a | yes | authoritative-negative / expired |
-| unknown | any | any | any | indeterminate |
-| source unavailable | any | any | any | indeterminate |
+| Evidence state | Authoritative | Complete for scope | Fresh | WP5 evaluator result | S21-04 wire decision |
+| --- | --- | --- | --- | --- | --- |
+| listed + applicable | yes | either | yes | positive | positive |
+| listed + applicable | no | either | yes | indeterminate | indeterminate |
+| listed + applicable | yes | either | no | indeterminate | indeterminate |
+| not listed | yes | yes | yes | authoritative-negative | authoritative-negative / not-listed |
+| not listed | yes | no | yes | indeterminate | indeterminate |
+| not listed | no | either | yes | indeterminate | indeterminate |
+| not listed | yes | yes | no | indeterminate | indeterminate |
+| not applicable | yes | n/a | yes | authoritative-negative / not-applicable | not-applicable / outside-scope |
+| revoked | yes | n/a | yes | authoritative-negative / revoked | authoritative-negative / revoked |
+| expired | yes | n/a | yes | authoritative-negative / expired | authoritative-negative / expired |
+| unknown | any | any | any | indeterminate | indeterminate |
+| source unavailable | any | any | any | indeterminate | indeterminate |
 
 `complete_for_scope` is especially important for absence. It is an explicit assertion that the source is expected to contain all relevant records for the declared scope such that absence carries negative meaning.
 
@@ -80,6 +80,8 @@ These states are intentionally distinct.
 `not-listed` means no applicable record was found in a source whose completeness may determine whether that absence has negative meaning.
 
 `not-applicable` means evidence exists or source semantics establish that the proposition falls outside the applicable purpose/resource/scope. It must not be collapsed into absence because it conveys a different governance fact.
+
+At the WP5 evaluator layer this distinction was carried as an authoritative-negative reason. At the S21-04 candidate wire layer it is promoted to the independent `not-applicable` decision with reason `outside-scope`. This is a deliberate refinement, not a claim about current upstream TRQP semantics.
 
 ## Revoked and expired
 
@@ -125,6 +127,7 @@ https://github.com/sankarshanmukhopadhyay/tswg-trust-registry-protocol/blob/feat
 - [x] unsafe false-negative collapse falsified;
 - [x] unsafe false-positive collapse falsified;
 - [x] provenance retained in evaluator output;
+- [x] S21-04 wire-level not-applicable refinement documented;
 - [ ] CI evidence GREEN;
 - [ ] independent TSPP evidence;
 - [ ] independent Interop Lab evidence;
