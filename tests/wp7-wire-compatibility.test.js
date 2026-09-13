@@ -105,6 +105,7 @@ test('pre-negotiated profile processes all mandatory qualifiers', () => {
   const result = evaluateCompatibility({
     ...base,
     context: { verification_material: 'urn:sha256:c2' },
+    critical_context: ['verification_material'],
     required_profiles: ['verification-material-v1']
   }, {
     supported_context: ['time', 'verification_material'],
