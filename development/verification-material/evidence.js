@@ -13,7 +13,18 @@ const RECORD_STATES = Object.freeze({
   REVOKED: 'revoked',
   EXPIRED: 'expired',
   UNKNOWN: 'unknown',
-  SOURCE_UNAVAILABLE: 'source-unavailable'
+  SOURCE_UNAVAILABLE: 'source-unavailable',
+  CONFLICTING: 'conflicting'
+});
+
+const EVIDENCE_STATES = Object.freeze({
+  SUFFICIENT: 'sufficient',
+  INCOMPLETE: 'incomplete',
+  STALE: 'stale',
+  UNAVAILABLE: 'unavailable',
+  NON_AUTHORITATIVE: 'non-authoritative',
+  CONFLICTING: 'conflicting',
+  UNKNOWN: 'unknown'
 });
 
 const REASONS = Object.freeze({
@@ -22,11 +33,12 @@ const REASONS = Object.freeze({
   NOT_APPLICABLE: 'not-applicable',
   REVOKED: 'revoked',
   EXPIRED: 'expired',
-  STALE: 'stale',
-  SOURCE_INCOMPLETE: 'source-incomplete',
+  EVIDENCE_STALE: 'evidence-stale',
+  EVIDENCE_INCOMPLETE: 'evidence-incomplete',
   SOURCE_NON_AUTHORITATIVE: 'source-non-authoritative',
   SOURCE_UNAVAILABLE: 'source-unavailable',
-  UNKNOWN: 'unknown'
+  EVIDENCE_CONFLICTING: 'evidence-conflicting',
+  EVIDENCE_UNKNOWN: 'evidence-unknown'
 });
 
 function nonEmpty(value, field) {
@@ -80,41 +92,42 @@ function evaluateEvidence(input) {
     fresh: isFresh(source, evaluation.toISOString())
   };
 
-  if (recordState === RECORD_STATES.SOURCE_UNAVAILABLE) return decision(base, DECISIONS.INDETERMINATE, REASONS.SOURCE_UNAVAILABLE);
-  if (recordState === RECORD_STATES.UNKNOWN) return decision(base, DECISIONS.INDETERMINATE, REASONS.UNKNOWN);
-  if (!source.authoritative) return decision(base, DECISIONS.INDETERMINATE, REASONS.SOURCE_NON_AUTHORITATIVE);
-  if (!base.fresh) return decision(base, DECISIONS.INDETERMINATE, REASONS.STALE);
+  if (recordState === RECORD_STATES.SOURCE_UNAVAILABLE) return decision(base, DECISIONS.INDETERMINATE, REASONS.SOURCE_UNAVAILABLE, EVIDENCE_STATES.UNAVAILABLE);
+  if (recordState === RECORD_STATES.CONFLICTING) return decision(base, DECISIONS.INDETERMINATE, REASONS.EVIDENCE_CONFLICTING, EVIDENCE_STATES.CONFLICTING);
+  if (recordState === RECORD_STATES.UNKNOWN) return decision(base, DECISIONS.INDETERMINATE, REASONS.EVIDENCE_UNKNOWN, EVIDENCE_STATES.UNKNOWN);
+  if (!source.authoritative) return decision(base, DECISIONS.INDETERMINATE, REASONS.SOURCE_NON_AUTHORITATIVE, EVIDENCE_STATES.NON_AUTHORITATIVE);
+  if (!base.fresh) return decision(base, DECISIONS.INDETERMINATE, REASONS.EVIDENCE_STALE, EVIDENCE_STATES.STALE);
 
   if (recordState === RECORD_STATES.LISTED_APPLICABLE) {
-    return decision(base, DECISIONS.POSITIVE, REASONS.EVIDENCE_SUPPORTS_PROPOSITION);
+    return decision(base, DECISIONS.POSITIVE, REASONS.EVIDENCE_SUPPORTS_PROPOSITION, EVIDENCE_STATES.SUFFICIENT);
   }
 
-  // A definitive negative from absence requires a completeness assertion.
   if (recordState === RECORD_STATES.NOT_LISTED && !source.complete_for_scope) {
-    return decision(base, DECISIONS.INDETERMINATE, REASONS.SOURCE_INCOMPLETE);
+    return decision(base, DECISIONS.INDETERMINATE, REASONS.EVIDENCE_INCOMPLETE, EVIDENCE_STATES.INCOMPLETE);
   }
 
   switch (recordState) {
     case RECORD_STATES.NOT_LISTED:
-      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.AUTHORITATIVE_ABSENCE);
+      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.AUTHORITATIVE_ABSENCE, EVIDENCE_STATES.SUFFICIENT);
     case RECORD_STATES.NOT_APPLICABLE:
-      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.NOT_APPLICABLE);
+      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.NOT_APPLICABLE, EVIDENCE_STATES.SUFFICIENT);
     case RECORD_STATES.REVOKED:
-      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.REVOKED);
+      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.REVOKED, EVIDENCE_STATES.SUFFICIENT);
     case RECORD_STATES.EXPIRED:
-      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.EXPIRED);
+      return decision(base, DECISIONS.AUTHORITATIVE_NEGATIVE, REASONS.EXPIRED, EVIDENCE_STATES.SUFFICIENT);
     default:
-      return decision(base, DECISIONS.INDETERMINATE, REASONS.UNKNOWN);
+      return decision(base, DECISIONS.INDETERMINATE, REASONS.EVIDENCE_UNKNOWN, EVIDENCE_STATES.UNKNOWN);
   }
 }
 
-function decision(base, classification, reason) {
-  return Object.freeze({ ...base, decision: classification, reason });
+function decision(base, classification, reason, evidenceState) {
+  return Object.freeze({ ...base, evidence_state: evidenceState, decision: classification, reason });
 }
 
 module.exports = {
   DECISIONS,
   RECORD_STATES,
+  EVIDENCE_STATES,
   REASONS,
   createEvidenceSource,
   isFresh,
