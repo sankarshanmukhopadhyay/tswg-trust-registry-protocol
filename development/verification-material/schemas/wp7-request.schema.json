@@ -45,6 +45,22 @@
           "context": { "required": ["verification_material"] }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "context": { "required": ["verification_material"] }
+        },
+        "required": ["context"]
+      },
+      "then": {
+        "required": ["critical_context"],
+        "properties": {
+          "critical_context": {
+            "contains": { "const": "verification_material" }
+          }
+        }
+      }
     }
   ],
   "additionalProperties": false
