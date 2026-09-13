@@ -43,15 +43,17 @@ The identifier scheme used as the value is intentionally not fixed by this propo
 
 ## Evidence
 
-Existing executable evidence demonstrates:
+Executable candidate artifacts now enforce and test that:
 
 - generic-v2 processing can silently drop `verification_material` and produce a principal-only false positive;
+- candidate processing rejects `verification_material` when it is not explicitly declared critical;
 - an unsupported critical `verification_material` fails closed;
 - explicit endpoint support preserves the exact material reference;
 - distinct material references remain distinguishable;
 - a profile identifier without a processing contract is insufficient;
-- a negotiated profile is sufficient only when its mandatory contract requires `verification_material` and the endpoint supports it;
-- the request schema rejects candidate requests that contain `verification_material` without declaring it critical, and rejects critical declarations where the member is absent.
+- a profile contract fails closed when any additional mandatory qualifier is unavailable;
+- a negotiated profile processes only when its mandatory contract is satisfiable;
+- the request schema requires bidirectional consistency between `context.verification_material` and `critical_context`.
 
 Relevant artifacts:
 
@@ -59,6 +61,8 @@ Relevant artifacts:
 - `development/verification-material/wp7-wire.js`
 - `tests/wp7-wire-compatibility.test.js`
 - WP1/WP2 principal/material model and exact-binding evidence
+
+The repository's reference-test workflow is PR-triggered, so this direct candidate-branch tranche has no GitHub check-run attached yet. The next PR/reconciliation pass MUST run the full reference suite before promotion.
 
 ## Falsification boundary
 
@@ -81,7 +85,7 @@ section21: S21-02
 issue: 32
 class: normative-proposal
 state: downstream_proposal_ready
-evidence: executable
+evidence: executable-awaiting-pr-ci
 authority:
   semantics: downstream-evidenced
   wire-spelling: upstream-required
