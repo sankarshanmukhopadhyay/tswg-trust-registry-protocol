@@ -17,6 +17,13 @@ test('legacy v2 can produce a false positive by silently dropping verification_m
   assert.equal(Object.hasOwn(result, 'verification_material'), false);
 });
 
+test('candidate processing rejects verification_material that is not declared critical', () => {
+  assert.throws(() => evaluateCompatibility({
+    ...base,
+    context: { verification_material: 'urn:sha256:c2' }
+  }, { supported_context: ['verification_material'] }), /declared in critical_context/);
+});
+
 test('critical-members mechanism fails closed when verification_material is unsupported', () => {
   const result = evaluateCompatibility({
     ...base,
@@ -62,9 +69,10 @@ test('required profile fails closed when endpoint does not advertise support', (
   const result = evaluateCompatibility({
     ...base,
     context: { verification_material: 'urn:sha256:c2' },
+    critical_context: ['verification_material'],
     required_profiles: ['verification-material-v1']
   }, {
-    supported_context: ['time'],
+    supported_context: ['verification_material'],
     supported_profiles: []
   });
   assert.equal(result.decision, DECISIONS.INDETERMINATE);
@@ -75,9 +83,10 @@ test('profile identifier without a processing contract fails closed', () => {
   const result = evaluateCompatibility({
     ...base,
     context: { verification_material: 'urn:sha256:c2' },
+    critical_context: ['verification_material'],
     required_profiles: ['verification-material-v1']
   }, {
-    supported_context: ['time'],
+    supported_context: ['verification_material'],
     supported_profiles: ['verification-material-v1']
   });
   assert.equal(result.decision, DECISIONS.INDETERMINATE);
@@ -88,6 +97,7 @@ test('profile contract fails closed when mandatory qualifier processing is unava
   const result = evaluateCompatibility({
     ...base,
     context: { verification_material: 'urn:sha256:c2' },
+    critical_context: ['verification_material'],
     required_profiles: ['verification-material-v1']
   }, {
     supported_context: ['time'],
@@ -97,8 +107,7 @@ test('profile contract fails closed when mandatory qualifier processing is unava
     }
   });
   assert.equal(result.decision, DECISIONS.INDETERMINATE);
-  assert.equal(result.reason, REASONS.PROFILE_CONTRACT_UNSATISFIED);
-  assert.deepEqual(result.missing_required_context, ['verification_material']);
+  assert.equal(result.reason, REASONS.UNSUPPORTED_CRITICAL_CONTEXT);
 });
 
 test('pre-negotiated profile processes all mandatory qualifiers', () => {
