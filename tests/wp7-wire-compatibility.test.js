@@ -30,16 +30,32 @@ test('critical-members mechanism fails closed when verification_material is unsu
   assert.deepEqual(result.unsupported_critical_context, ['verification_material']);
 });
 
-test('critical context is processed when endpoint explicitly supports it', () => {
+test('critical context preserves the exact verification_material value', () => {
+  const material = 'urn:sha256:c2';
   const result = evaluateCompatibility({
     ...base,
-    context: { verification_material: 'urn:sha256:c2', time: '2026-06-01T00:00:00Z' },
+    context: { verification_material: material, time: '2026-06-01T00:00:00Z' },
     critical_context: ['verification_material']
   }, {
     supported_context: ['time', 'verification_material']
   });
   assert.equal(result.decision, DECISIONS.PROCESSED);
-  assert.equal(result.context.verification_material, 'urn:sha256:c2');
+  assert.equal(result.context.verification_material, material);
+});
+
+test('different exact verification-material references remain distinguishable', () => {
+  const endpoint = { supported_context: ['verification_material'] };
+  const first = evaluateCompatibility({
+    ...base,
+    context: { verification_material: 'urn:sha256:c1' },
+    critical_context: ['verification_material']
+  }, endpoint);
+  const second = evaluateCompatibility({
+    ...base,
+    context: { verification_material: 'urn:sha256:c2' },
+    critical_context: ['verification_material']
+  }, endpoint);
+  assert.notEqual(first.context.verification_material, second.context.verification_material);
 });
 
 test('required profile fails closed when endpoint does not advertise support', () => {
