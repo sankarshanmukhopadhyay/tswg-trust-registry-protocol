@@ -93,21 +93,22 @@ test('profile identifier without a processing contract fails closed', () => {
   assert.equal(result.reason, REASONS.PROFILE_CONTRACT_UNSATISFIED);
 });
 
-test('profile contract fails closed when mandatory qualifier processing is unavailable', () => {
+test('profile contract fails closed when another mandatory qualifier is unavailable', () => {
   const result = evaluateCompatibility({
     ...base,
     context: { verification_material: 'urn:sha256:c2' },
     critical_context: ['verification_material'],
     required_profiles: ['verification-material-v1']
   }, {
-    supported_context: ['time'],
+    supported_context: ['verification_material'],
     supported_profiles: ['verification-material-v1'],
     profile_contracts: {
-      'verification-material-v1': { required_context: ['verification_material'] }
+      'verification-material-v1': { required_context: ['verification_material', 'time'] }
     }
   });
   assert.equal(result.decision, DECISIONS.INDETERMINATE);
-  assert.equal(result.reason, REASONS.UNSUPPORTED_CRITICAL_CONTEXT);
+  assert.equal(result.reason, REASONS.PROFILE_CONTRACT_UNSATISFIED);
+  assert.deepEqual(result.missing_required_context, ['time']);
 });
 
 test('pre-negotiated profile processes all mandatory qualifiers', () => {
