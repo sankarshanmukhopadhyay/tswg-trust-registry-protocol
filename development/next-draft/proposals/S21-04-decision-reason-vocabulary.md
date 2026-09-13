@@ -24,8 +24,6 @@ If an `authorized` boolean is retained for compatibility/readability, it MUST NO
 
 ## Minimum reason categories
 
-The downstream candidate defines stable categories rather than implementation-specific diagnostics:
-
 | Decision | Reason | Meaning |
 | --- | --- | --- |
 | `positive` | `established` | authoritative applicable evidence establishes the proposition |
@@ -42,7 +40,7 @@ The downstream candidate defines stable categories rather than implementation-sp
 | `indeterminate` | `profile-contract-unsatisfied` | named profile exists but its mandatory processing contract cannot be satisfied |
 | `not-applicable` | `outside-scope` | evidence/source semantics establish that the proposition is outside applicable scope |
 
-This list is deliberately minimal. Implementations MAY expose additional diagnostic detail, but clients MUST NOT need to parse human-readable prose to recover the decision class.
+This list is deliberately minimal. Implementations MAY expose additional diagnostic detail in separately defined extension fields, but clients MUST NOT need to parse human-readable prose to recover the decision class or rely on undeclared reason strings as interoperable semantics.
 
 ## Deterministic mapping rules
 
@@ -56,52 +54,43 @@ This list is deliberately minimal. Implementations MAY expose additional diagnos
 
 ## Candidate response examples
 
-Positive:
-
 ```json
-{
-  "decision": "positive",
-  "reason": "established"
-}
+{ "decision": "positive", "reason": "established", "authorized": true }
 ```
 
-Authoritative negative:
-
 ```json
-{
-  "decision": "authoritative-negative",
-  "reason": "revoked"
-}
+{ "decision": "authoritative-negative", "reason": "revoked", "authorized": false }
 ```
 
-Indeterminate despite successful transport:
-
 ```json
-{
-  "decision": "indeterminate",
-  "reason": "historical-evidence-incomplete",
-  "authorized": false
-}
+{ "decision": "indeterminate", "reason": "historical-evidence-incomplete", "authorized": false }
 ```
 
-Not applicable:
-
 ```json
-{
-  "decision": "not-applicable",
-  "reason": "outside-scope"
-}
+{ "decision": "not-applicable", "reason": "outside-scope", "authorized": false }
 ```
 
-## Evidence
+## Executable evidence
 
-WP5 establishes the core evidence semantics: missing records are not inherently negative; absence becomes authoritative only with authority, scope completeness, freshness, and applicability. It implements `positive`, `authoritative-negative`, and `indeterminate`, while explicitly distinguishing `not-listed` from `not-applicable`.
+The candidate response schema now constrains both dimensions:
 
-WP7 establishes that response semantics cannot safely overload `authorized: false`, and explicitly recommends preserving decision class and machine-readable reason independently from transport success.
+- `decision` is one of the four candidate classes;
+- `reason` is a closed candidate interoperability vocabulary;
+- reason values are constrained to the applicable decision class;
+- `positive` requires `established` and a positive authorization/recognition compatibility boolean;
+- non-positive classes cannot masquerade as positive through those compatibility booleans;
+- `not-applicable` is independently encoded as `not-applicable` / `outside-scope`;
+- unknown implementation-specific reason strings are non-conformant as core vocabulary.
 
-WP6 supplies the historical-evaluation requirement that insufficient historical evidence remains indeterminate.
+Artifacts:
 
-S21-02 and S21-03 supply protocol-processing reasons for unsupported critical semantics and unsatisfied capability/profile contracts.
+- `development/verification-material/schemas/wp7-response.schema.json`
+- `tests/wp7-conformance-vectors.test.js`
+- `development/verification-material/WP5-evidence-semantics.md`
+- `development/verification-material/WP6-historical-evaluation.md`
+- `development/verification-material/WP7-wire-candidate.md`
+
+The reference-test workflow is PR-triggered. These candidate-branch changes therefore require the next PR/reconciliation pass to produce CI evidence before promotion.
 
 ## Falsification boundary
 
@@ -116,7 +105,7 @@ This proposal fails if a conforming client must:
 
 ## Authority boundary
 
-The downstream evidence establishes the need for distinct semantic decision classes and stable machine-readable reasons. The exact vocabulary remains a downstream candidate until upstream adoption. Reason strings should therefore be treated as proposed interoperability identifiers, not current upstream TRQP normative values.
+The downstream evidence establishes the need for distinct semantic decision classes and stable machine-readable reasons. The exact vocabulary remains a downstream candidate until upstream adoption. Reason strings are proposed interoperability identifiers, not current upstream TRQP normative values.
 
 ## Disposition
 
@@ -125,7 +114,7 @@ section21: S21-04
 issue: 34
 class: normative-proposal
 state: downstream_proposal_ready
-evidence: reference-model-backed
+evidence: executable-awaiting-pr-ci
 authority:
   semantic-distinction: downstream-evidenced
   vocabulary: downstream-candidate
