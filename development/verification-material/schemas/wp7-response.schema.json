@@ -7,26 +7,11 @@
   "properties": {
     "authorized": { "type": "boolean" },
     "recognized": { "type": "boolean" },
-    "decision": {
-      "enum": ["positive", "authoritative-negative", "indeterminate", "not-applicable"]
-    },
+    "decision": { "enum": ["positive", "authoritative-negative", "indeterminate", "not-applicable"] },
     "reason": {
-      "enum": [
-        "established",
-        "not-listed",
-        "revoked",
-        "expired",
-        "source-unavailable",
-        "source-non-authoritative",
-        "evidence-incomplete",
-        "evidence-stale",
-        "historical-evidence-incomplete",
-        "unsupported-critical-context",
-        "required-profile-unsupported",
-        "profile-contract-unsatisfied",
-        "outside-scope"
-      ]
+      "enum": ["established", "not-listed", "revoked", "expired", "source-unavailable", "source-non-authoritative", "evidence-incomplete", "evidence-stale", "evidence-conflicting", "evidence-unknown", "historical-evidence-incomplete", "unsupported-critical-context", "required-profile-unsupported", "profile-contract-unsatisfied", "outside-scope"]
     },
+    "evidence_state": { "enum": ["sufficient", "incomplete", "stale", "unavailable", "non-authoritative", "conflicting", "unknown"] },
     "time_requested": { "type": "string", "format": "date-time" },
     "time_evaluated": { "type": "string", "format": "date-time" },
     "evidence": {
@@ -52,7 +37,7 @@
     {
       "if": { "properties": { "decision": { "const": "positive" } }, "required": ["decision"] },
       "then": {
-        "properties": { "reason": { "const": "established" } },
+        "properties": { "reason": { "const": "established" }, "evidence_state": { "const": "sufficient" } },
         "anyOf": [
           { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
           { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
@@ -62,42 +47,59 @@
     {
       "if": { "properties": { "decision": { "const": "authoritative-negative" } }, "required": ["decision"] },
       "then": {
-        "properties": { "reason": { "enum": ["not-listed", "revoked", "expired"] } },
-        "not": {
-          "anyOf": [
-            { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
-            { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
-          ]
-        }
+        "properties": { "reason": { "enum": ["not-listed", "revoked", "expired"] }, "evidence_state": { "const": "sufficient" } },
+        "not": { "anyOf": [
+          { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
+          { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
+        ] }
       }
     },
     {
       "if": { "properties": { "decision": { "const": "indeterminate" } }, "required": ["decision"] },
       "then": {
         "properties": {
-          "reason": {
-            "enum": ["source-unavailable", "source-non-authoritative", "evidence-incomplete", "evidence-stale", "historical-evidence-incomplete", "unsupported-critical-context", "required-profile-unsupported", "profile-contract-unsatisfied"]
-          }
+          "reason": { "enum": ["source-unavailable", "source-non-authoritative", "evidence-incomplete", "evidence-stale", "evidence-conflicting", "evidence-unknown", "historical-evidence-incomplete", "unsupported-critical-context", "required-profile-unsupported", "profile-contract-unsatisfied"] },
+          "evidence_state": { "enum": ["incomplete", "stale", "unavailable", "non-authoritative", "conflicting", "unknown"] }
         },
-        "not": {
-          "anyOf": [
-            { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
-            { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
-          ]
-        }
+        "not": { "anyOf": [
+          { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
+          { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
+        ] }
       }
     },
     {
       "if": { "properties": { "decision": { "const": "not-applicable" } }, "required": ["decision"] },
       "then": {
-        "properties": { "reason": { "const": "outside-scope" } },
-        "not": {
-          "anyOf": [
-            { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
-            { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
-          ]
-        }
+        "properties": { "reason": { "const": "outside-scope" }, "evidence_state": { "const": "sufficient" } },
+        "not": { "anyOf": [
+          { "properties": { "authorized": { "const": true } }, "required": ["authorized"] },
+          { "properties": { "recognized": { "const": true } }, "required": ["recognized"] }
+        ] }
       }
+    },
+    {
+      "if": { "properties": { "reason": { "const": "evidence-incomplete" } }, "required": ["reason", "evidence_state"] },
+      "then": { "properties": { "evidence_state": { "const": "incomplete" } } }
+    },
+    {
+      "if": { "properties": { "reason": { "const": "evidence-stale" } }, "required": ["reason", "evidence_state"] },
+      "then": { "properties": { "evidence_state": { "const": "stale" } } }
+    },
+    {
+      "if": { "properties": { "reason": { "const": "source-unavailable" } }, "required": ["reason", "evidence_state"] },
+      "then": { "properties": { "evidence_state": { "const": "unavailable" } } }
+    },
+    {
+      "if": { "properties": { "reason": { "const": "source-non-authoritative" } }, "required": ["reason", "evidence_state"] },
+      "then": { "properties": { "evidence_state": { "const": "non-authoritative" } } }
+    },
+    {
+      "if": { "properties": { "reason": { "const": "evidence-conflicting" } }, "required": ["reason", "evidence_state"] },
+      "then": { "properties": { "evidence_state": { "const": "conflicting" } } }
+    },
+    {
+      "if": { "properties": { "reason": { "const": "evidence-unknown" } }, "required": ["reason", "evidence_state"] },
+      "then": { "properties": { "evidence_state": { "const": "unknown" } } }
     }
   ],
   "additionalProperties": false
