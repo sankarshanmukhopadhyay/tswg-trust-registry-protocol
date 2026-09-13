@@ -13,13 +13,15 @@ The value identifies the exact verification material whose authority and lifecyc
 
 ## Candidate processing contract
 
-When verification material is decision-critical:
+For this candidate, presence of `context.verification_material` means that verification material is decision-critical. Therefore:
 
-1. the request MUST contain `context.verification_material` as a non-empty string;
-2. `critical_context` MUST contain `verification_material`, unless a successfully negotiated mandatory profile already binds the receiver to equivalent processing semantics;
-3. the processor MUST evaluate the proposition against the exact referenced material and MUST NOT fall back to principal-only evaluation;
+1. `context.verification_material` MUST be a non-empty string;
+2. `critical_context` MUST contain `verification_material`;
+3. a processor MUST evaluate the proposition against the exact referenced material and MUST NOT fall back to principal-only evaluation;
 4. material mismatch, unsupported material qualification, or inability to establish material lifecycle/authority state MUST NOT produce a material-dependent positive decision;
 5. a generic-v2 processor that can silently discard `verification_material` is not semantically compatible with such a request.
+
+A future upstream profile may define an equivalent mandatory processing contract, but this downstream wire proposal deliberately requires explicit criticality in the request so that the standalone artifact cannot be interpreted as safe merely because a profile label is present.
 
 ## Proposed wire example
 
@@ -45,9 +47,11 @@ Existing executable evidence demonstrates:
 
 - generic-v2 processing can silently drop `verification_material` and produce a principal-only false positive;
 - an unsupported critical `verification_material` fails closed;
-- explicit endpoint support permits processing;
+- explicit endpoint support preserves the exact material reference;
+- distinct material references remain distinguishable;
 - a profile identifier without a processing contract is insufficient;
-- a negotiated profile is sufficient only when its mandatory contract requires `verification_material` and the endpoint supports it.
+- a negotiated profile is sufficient only when its mandatory contract requires `verification_material` and the endpoint supports it;
+- the request schema rejects candidate requests that contain `verification_material` without declaring it critical, and rejects critical declarations where the member is absent.
 
 Relevant artifacts:
 
