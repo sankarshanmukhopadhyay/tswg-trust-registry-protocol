@@ -29,5 +29,23 @@
       "items": { "type": "string", "minLength": 1 }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "critical_context": {
+            "contains": { "const": "verification_material" }
+          }
+        },
+        "required": ["critical_context"]
+      },
+      "then": {
+        "required": ["context"],
+        "properties": {
+          "context": { "required": ["verification_material"] }
+        }
+      }
+    }
+  ],
   "additionalProperties": false
 }
