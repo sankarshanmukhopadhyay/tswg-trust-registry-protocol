@@ -1,27 +1,18 @@
 {
     "specs": [
         {
-            "title": "ToIP Trust Registry Query Protocol (TRQP) v2.0 (Working Draft)",
-            "spec_directory": "./specification/v2",
-            "output_path": "./dist/draft",
+            "title": "Trust Registry Query Protocol (TRQP) v3 — Downstream Candidate",
+            "spec_directory": "./development/next-draft",
+            "output_path": "./dist/candidate-v3",
             "markdown_paths": [
-                "overview.md",
-                "core/spec.md",
-                "core/hla.md",
-                "core/identifiers.md",
-                "core/api.md",
-                "core/https_binding.md",
-                "versioning.md",
-                "conformance.md",
-                "considerations.md",
-                "references.md"
+                "CANDIDATE-TRQP-V3.md"
             ],
             "katex": false,
             "logo": "https://raw.githubusercontent.com/trustoverip/logo-assets/master/logos/ToIP-Logo-Color-SolidDimensional-Horizontal-LightOnDark.svg",
-            "logo_link": "https://github.com/trustoverip/specification-template",
+            "logo_link": "https://github.com/trustoverip/tswg-trust-registry-protocol",
             "source": {
                 "host": "github",
-                "account": "trustoverip",
+                "account": "sankarshanmukhopadhyay",
                 "repo": "tswg-trust-registry-protocol"
             },
             "external_specs": [
