@@ -1,59 +1,69 @@
-# Overview
+# Trust Registry Query Protocol — downstream v3 candidate branch
 
-The ToIP Trust Registry Query Protocol (TRQP) is a lightweight, read-only protocol for making fast, efficient queries for authoritative data from trust registries, also known as trust lists. To use an analogy, TRQP is to trust registries what DNS is to name servers.
+> **Status:** This branch is the complete downstream TRQP v3 release-candidate proposal. It is not an adopted Trust Over IP specification. The repository `main` branch remains the stable approved-v2 line until an explicit promotion decision is made.
 
-The same way DNS name servers serve name domains, TRQP trust registries serve trust domains, also known as digital trust ecosystems. Four primary actors participate in the flow of verifiable data (including verifiable credentials) within the ecosystem: 1) data producers (issuers), 2) data subjects (holders), 3) data consumers (verifiers or relying parties), and 4) governing bodies (authorities).
+This branch is intentionally organized so it can be reviewed as a product rather than reconstructed from development history. A reviewer or implementer should be able to understand the proposed protocol, implement it, run its conformance evidence, assess migration from v2, and inspect the remaining upstream authority boundaries from this branch alone.
 
-Authorities determine the policies governing which actors can perform what actions on what data within the ecosystem. These policies are typically published in a human-readable form called a governance framework, also known as a trust framework. To make these policies accessible to software agents, they are published in a machine-readable form known as authority statements.
+## Start here
 
-Authority statements can be published in a file, issued to individual actors as verifiable credentials, or published in a trust registry.
+1. **Normative candidate specification:** [`development/next-draft/CANDIDATE-TRQP-V3.md`](development/next-draft/CANDIDATE-TRQP-V3.md)
+2. **Stable normative requirement IDs:** [`development/next-draft/NORMATIVE-REQUIREMENTS.md`](development/next-draft/NORMATIVE-REQUIREMENTS.md)
+3. **Candidate request/response schemas:** [`development/verification-material/schemas/`](development/verification-material/schemas/)
+4. **Candidate examples:** [`development/next-draft/examples/`](development/next-draft/examples/)
+5. **Implementer's Guide:** [`development/next-draft/IMPLEMENTERS-GUIDE.md`](development/next-draft/IMPLEMENTERS-GUIDE.md)
+6. **v2 → v3 Migration Guide:** [`development/next-draft/V2-TO-V3-MIGRATION-GUIDE.md`](development/next-draft/V2-TO-V3-MIGRATION-GUIDE.md)
+7. **Conformance & Interoperability Guide:** [`development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md`](development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md)
+8. **Using TRQP in Agentic Systems:** [`development/next-draft/AGENTIC-USAGE-GUIDE.md`](development/next-draft/AGENTIC-USAGE-GUIDE.md)
+9. **Operational Guidance:** [`development/next-draft/OPERATIONAL-GUIDANCE.md`](development/next-draft/OPERATIONAL-GUIDANCE.md)
+10. **Requirement → executable-evidence traceability:** [`development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md`](development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md)
 
-Digitally-verifiable authority statements can be expressed using various standards, including X.509 certificate hierarchies, OpenID Federations, EBSI Trust Chains, or TRAIN trust lists. Although these standards can work well for intra-ecosystem authority verification, they are not optimized for inter-ecosystem authority verification.
+## What v3 changes
 
-The purpose of TRQP is to bridge this gap by provide a standard protocol for querying authority statements from any TRQP-compliant trust registry. It specifies a standard data model, query vocabulary, and transport protocol binding that can be implemented by any ecosystem regardless of its internal trust architecture.
+The candidate keeps TRQP a read-only trust-registry query/evaluation protocol while making its decision boundary explicit. Evaluation is bounded by the exact proposition, which may include principal, authority, action, resource, verification material, evaluation time and declared decision-critical context. The candidate separates semantic decision state from transport state; preserves uncertainty when evidence is insufficient; treats principal, relationship and verification-material lifecycle independently unless governance explicitly couples them; prohibits silent downgrade to generic v2; and defines direct recognition without inferred transitivity.
 
-TRQP focuses on two query types:
+Agentic use is a mandatory stress lens, not an expansion of TRQP into an agent protocol. Agent identity, capability, delegation evidence and transaction authority remain distinct. Delegation instruments, workflow authorization, payments, messaging and agent lifecycle remain outside TRQP's protocol scope.
 
-1. Authorization Queries: “Has Entity X been granted Authorization Y under Ecosystem Governance Framework Z?”
-2. Recognition Queries: "Is Ecosystem A recognized as having Authorization Y by Ecosystem C?” 
+## Conformance and validation
 
-# specification-template
+The branch carries executable downstream evidence under `tests/` and `development/verification-material/`. GitHub Actions runs the complete downstream reference-model suite and the RC-readiness validator. The readiness controls account for stable requirement families, candidate schema surfaces, SHOULD disposition, unresolved editorial markers and semantic-field-loss protections.
 
-This specification is based on the [Trust Over IP Specification Template](https://github.com/trustoverip/specification-template).
+Local differential tests demonstrate repository-local consistency. They **do not** constitute independent organizational interoperability, and this branch does not claim otherwise.
 
-The spec is written using [SpecUp](https://github.com/decentralized-identity/spec-up) which is maintained by the Decentralized Identity Foundation. 
+## Authority boundary
 
-To browse the spec, see the [rendering on GitHub pages](https://trustoverip.github.io/tswg-trust-registry-protocol/). To contribute to the spec, submit PRs that modify the .md files (in the `./spec` folder) that are used to generate the .html files in this folder.
+The candidate is publication-grade as a downstream proposal, but final upstream adoption, final major-version/profile naming, final schema identifiers/member spelling, and independent external interoperability remain outside downstream authority. Those boundaries are explicit so that absence of upstream adoption cannot be mistaken for an unresolved local semantic rule.
 
-Before submitting a PR, please see the [Editing The Spec](./EditingTheSpec.md) document for guidance on generating the specification locally for review.
+Approved v2 material is retained under [`specification/v2-approved/`](specification/v2-approved/) as the migration and provenance baseline. It is not the normative implementation target for this branch's v3 candidate.
 
-## Rendering Spec-Up
+## Branch-as-product promotion invariant
 
-To run Spec-up in live edit mode (will re-render upon save), in project folder run:
+The intended promotion model is:
 
+```text
+main (stable v2)
+       +
+merge draft/next-trqp after all RC gates are green
+       ↓
+main becomes a coherent TRQP v3 repository
 ```
-npm run edit
-```
 
-## Test Suite
+Before promotion, the candidate branch must satisfy all of the following:
 
-A formal conformance test suite for TRQP v2.0 does not yet exist. The specification defines conformance targets for TRQP Endpoints, TRQP Consumers, and the HTTPS Binding (see the Conformance section of the [rendered specification](https://trustoverip.github.io/tswg-trust-registry-protocol/)), which are intended to serve as the basis for a future test suite.
+- the end-to-end candidate specification contains the normative protocol behaviour;
+- schemas/examples and normative prose are reconciled;
+- requirement IDs are traceable to executable evidence;
+- migration, implementation, conformance, agentic and operational guidance are present;
+- repository/document references are valid for the candidate product surface;
+- complete tests and RC-readiness validation are green;
+- no development-history issue or PR is required to understand normative behaviour;
+- v2 remains clearly identified as the retained approved baseline rather than the candidate implementation target.
 
-Contributions toward a test suite are welcome. If you are interested in contributing, please [start a discussion](https://github.com/trustoverip/tswg-trust-registry-protocol/discussions) or [file an issue](https://github.com/trustoverip/tswg-trust-registry-protocol/issues).
+A clean merge into `main` must not require a second semantic-integration exercise. Promotion may still require release metadata/tagging and an upstream authority decision, but it must not require reconstructing what v3 means.
 
-## Action Vocabulary
+## Development evidence
 
-The `action` field in TRQP queries is an open string defined by each authority in its governance framework. There is currently no standardized vocabulary of common `action` strings across ecosystems.
+`development/` contains both the canonical candidate product artifacts above and supporting evidence/provenance used to derive them. Work-packet notes and disposition registers are evidence, not substitute normative specifications. If a supporting artifact appears to introduce protocol behaviour not present in `CANDIDATE-TRQP-V3.md`, that is a release defect and must be reconciled before RC promotion.
 
-A vocabulary of common `action` strings may be explored by the ToIP Trust Registry Task Force in a future version of this specification or as a companion specification. In the interim, implementers are encouraged to define their `action` strings explicitly in their governance framework and share them with the community to facilitate cross-ecosystem interoperability.
+## Editing and contribution
 
-If you are interested in contributing to this effort, please [start a discussion](https://github.com/trustoverip/tswg-trust-registry-protocol/discussions) or [file an issue](https://github.com/trustoverip/tswg-trust-registry-protocol/issues).
-
-## Future Version Considerations:
-
-The TRQP v2.0 specification is focused solely on Recognition and Authorization queries. Two other key areas were under discussion but didn't reach a point of closure, so have not been included in the v2.0 specification and may be addressed in further releases. These are:
-
-- **Delegation Queries**: "Has Ecosystem A been delegated authority for Governance Framework D by Ecosystem C?"
-- **Description (Metadata) Queries**: “What DID methods does Ecosystem A support?”
-
-A further area about establishing a "query language" emerged from the efforts in the Trust Registry Task Force, which has taken on the [Trust Registry Query Language](https://lf-toip.atlassian.net/wiki/spaces/HOME/pages/149749777/TRQL+Trust+Registry+Query+Language) as a separate specification to consider.
+Changes to the v3 candidate should be made on short-lived branches targeting `draft/next-trqp`, with modular commits and executable tests wherever behavior can be tested. `main` should remain stable until the candidate passes the promotion invariant.
