@@ -77,14 +77,7 @@ A semantic response communicates the outcome of evaluating the proposition. Clie
   "recognized": false,
   "evaluation_time": "2026-09-14T00:00:00Z",
   "evidence_state": "sufficient",
-  "evidence": [
-    {
-      "source_id": "urn:registry:evidence:42",
-      "authoritative": true,
-      "complete_for_scope": true,
-      "effective_from": "2026-09-01T00:00:00Z"
-    }
-  ]
+  "evidence": [{"source_id":"urn:registry:evidence:42","authoritative":true,"complete_for_scope":true,"effective_from":"2026-09-01T00:00:00Z"}]
 }
 ```
 
@@ -101,8 +94,6 @@ A semantic response communicates the outcome of evaluating the proposition. Clie
 
 A processing failure is not a semantic negative. Where HTTP is used, materially revised errors SHOULD use RFC 9457 Problem Details.
 
-Recommended candidate mapping:
-
 | HTTP | Situation | Semantic interpretation |
 |---:|---|---|
 | `200` | Semantic evaluation completed. | Inspect `decision`; 200 does not imply positive. |
@@ -116,33 +107,13 @@ Problem Details should expose a stable `type`, `title`, `status`, and bounded ma
 
 ## 6. Negotiation
 
-Before candidate evaluation, peers must establish support for:
-
-1. the candidate processing contract/version;
-2. every required profile and its mandatory semantics;
-3. every decision-critical context member.
-
-A peer that merely parses the JSON is not candidate-capable. If negotiation is absent, stale, ambiguous or fails, the client/server MUST NOT remove qualifiers or retry the request as generic v2.
+Before candidate evaluation, peers must establish support for the candidate processing contract/version, every required profile and its mandatory semantics, and every decision-critical context member. A peer that merely parses the JSON is not candidate-capable. Failed or ambiguous negotiation MUST NOT cause qualifiers to be removed or the request to be retried as generic v2.
 
 ## 7. Discovery and capabilities
 
-Discovery answers **where and how to contact a capable endpoint**; it does not establish authorization, recognition or registry membership.
-
-A candidate capability document should identify at least:
-
-- service/registry identity;
-- endpoint location(s);
-- supported protocol versions;
-- supported profiles;
-- supported decision-critical context;
-- mandatory processing semantics sufficient to validate negotiation;
-- authority/freshness information for the capability assertion.
-
-The repository includes an experimental `.well-known` discovery binding as executable evidence. Core candidate semantics do not require a single production discovery transport.
+Discovery answers **where and how to contact a capable endpoint**; it does not establish authorization, recognition or registry membership. A candidate capability document should identify service/registry identity, endpoint locations, supported versions/profiles/critical context, mandatory processing semantics and enough authority/freshness information to validate the assertion. The repository includes experimental discovery evidence; core candidate semantics do not require one production discovery transport.
 
 ## 8. Agentic parameter interpretation
-
-For agentic use, keep these identities separate:
 
 | Concept | API representation | Must not be inferred from |
 |---|---|---|
@@ -158,12 +129,15 @@ Changing any decision-critical delegation scope, action, resource, time, materia
 
 ## 9. Schema and conformance references
 
-The executable candidate schemas currently live under `development/verification-material/schemas/`. Stable public aliases are provided under `specification/v3/schemas/` for developer discovery. Normative semantics remain governed by the candidate specification; schema acceptance must never be used to erase decision-critical semantics.
+Executable candidate schemas remain under `development/verification-material/schemas/`; [`schemas/`](schemas/) is the stable public discovery surface. Normative semantics are governed by [`TRQP-V3.md`](TRQP-V3.md), and schema acceptance must never erase decision-critical semantics.
 
 See also:
 
-- [`README.md`](README.md) — v3 public specification entry point
-- [`../../development/next-draft/CANDIDATE-TRQP-V3.md`](../../development/next-draft/CANDIDATE-TRQP-V3.md) — complete normative text
-- [`../../development/next-draft/IMPLEMENTERS-GUIDE.md`](../../development/next-draft/IMPLEMENTERS-GUIDE.md) — implementation pipeline
-- [`../../development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md`](../../development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md) — conformance/interoperability
-- [`../../development/next-draft/AGENTIC-USAGE-GUIDE.md`](../../development/next-draft/AGENTIC-USAGE-GUIDE.md) — agentic stress model
+- [`README.md`](README.md) — v3 product entry point
+- [`TRQP-V3.md`](TRQP-V3.md) — complete normative text
+- [`guides/IMPLEMENTERS-GUIDE.md`](guides/IMPLEMENTERS-GUIDE.md) — implementation pipeline
+- [`guides/AGENTIC-USAGE.md`](guides/AGENTIC-USAGE.md) — agentic usage
+- [`guides/OPERATIONAL-GUIDANCE.md`](guides/OPERATIONAL-GUIDANCE.md) — operations
+- [`conformance/REQUIREMENTS.md`](conformance/REQUIREMENTS.md) — stable requirement IDs
+- [`conformance/INTEROPERABILITY.md`](conformance/INTEROPERABILITY.md) — conformance/interoperability
+- [`conformance/TRACEABILITY.md`](conformance/TRACEABILITY.md) — requirement-to-evidence mapping
