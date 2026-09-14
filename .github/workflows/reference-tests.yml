@@ -26,3 +26,6 @@ jobs:
 
       - name: Run baseline and reference-model tests
         run: node --test tests/*.test.js
+
+      - name: Validate v3 RC readiness controls
+        run: node scripts/validate-v3-readiness.mjs
