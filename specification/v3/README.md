@@ -4,17 +4,22 @@
 
 The complete normative specification text is maintained in [`../../development/next-draft/CANDIDATE-TRQP-V3.md`](../../development/next-draft/CANDIDATE-TRQP-V3.md) and is incorporated here by reference for this candidate branch.
 
+## Start here
+
+- **Protocol specification:** [`CANDIDATE-TRQP-V3.md`](../../development/next-draft/CANDIDATE-TRQP-V3.md)
+- **Developer API & parameter reference:** [`API.md`](API.md)
+- **Machine-readable candidate HTTP contract:** [`openapi.yaml`](openapi.yaml)
+- **Schema discovery surface:** [`schemas/`](schemas/)
+
+If you are implementing the candidate HTTP-facing API, begin with `API.md` and `openapi.yaml`; use the normative specification to resolve semantic requirements and the conformance material to verify behavior.
+
 ## Status and authority
 
 `main` remains the stable downstream TRQP v2 line. `draft/next-trqp` is intentionally a separate, self-contained proposed-v3 branch that can be reviewed, implemented and tested without changing `main`.
 
-The v3 designation, final upstream schema identifiers/member spelling, production binding selection, and upstream adoption remain external authority decisions. Those boundaries do not weaken the candidate semantics.
+The v3 designation, final upstream schema identifiers/member spelling, production binding selection, and upstream adoption remain external authority decisions. The `/trqp/v3/query` path documented by the candidate OpenAPI contract is a downstream HTTP-binding convention, not an adopted upstream endpoint identifier. Those boundaries do not weaken the candidate semantics.
 
-## Normative specification
-
-**Read the full normative text:** [`CANDIDATE-TRQP-V3.md`](../../development/next-draft/CANDIDATE-TRQP-V3.md)
-
-The specification defines the candidate protocol's:
+## What the normative specification defines
 
 - bounded proposition and decision-critical context model;
 - principal and verification-material separation;
@@ -31,19 +36,28 @@ The specification defines the candidate protocol's:
 - agentic-system and delegation/composition boundaries;
 - conformance requirements and operational obligations.
 
-## Implementation package
+## Complete implementation package
 
-The candidate is more than specification prose. Use these artifacts together:
+| Need | Artifact |
+|---|---|
+| API operations and parameter semantics | [`API.md`](API.md) |
+| OpenAPI 3.1 contract | [`openapi.yaml`](openapi.yaml) |
+| Candidate schema discovery | [`schemas/`](schemas/) |
+| Stable normative requirement IDs | [`NORMATIVE-REQUIREMENTS.md`](../../development/next-draft/NORMATIVE-REQUIREMENTS.md) |
+| Executable request/response schemas | [`development/verification-material/schemas/`](../../development/verification-material/schemas/) |
+| Candidate examples | [`examples/`](../../development/next-draft/examples/) |
+| Implementer's Guide | [`IMPLEMENTERS-GUIDE.md`](../../development/next-draft/IMPLEMENTERS-GUIDE.md) |
+| v2 → v3 Migration Guide | [`V2-TO-V3-MIGRATION-GUIDE.md`](../../development/next-draft/V2-TO-V3-MIGRATION-GUIDE.md) |
+| Conformance & Interoperability Guide | [`CONFORMANCE-AND-INTEROP-GUIDE.md`](../../development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md) |
+| Using TRQP in Agentic Systems | [`AGENTIC-USAGE-GUIDE.md`](../../development/next-draft/AGENTIC-USAGE-GUIDE.md) |
+| Operational Guidance | [`OPERATIONAL-GUIDANCE.md`](../../development/next-draft/OPERATIONAL-GUIDANCE.md) |
+| Requirement → executable-evidence traceability | [`REQUIREMENT-TEST-TRACEABILITY.md`](../../development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md) |
 
-- [Stable normative requirement IDs](../../development/next-draft/NORMATIVE-REQUIREMENTS.md)
-- [Candidate request/response schemas](../../development/verification-material/schemas/)
-- [Candidate examples](../../development/next-draft/examples/)
-- [Implementer's Guide](../../development/next-draft/IMPLEMENTERS-GUIDE.md)
-- [v2 → v3 Migration Guide](../../development/next-draft/V2-TO-V3-MIGRATION-GUIDE.md)
-- [Conformance & Interoperability Guide](../../development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md)
-- [Using TRQP in Agentic Systems](../../development/next-draft/AGENTIC-USAGE-GUIDE.md)
-- [Operational Guidance](../../development/next-draft/OPERATIONAL-GUIDANCE.md)
-- [Requirement → executable-evidence traceability](../../development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md)
+## API semantics in one paragraph
+
+A candidate client evaluates an exact bounded proposition, not a generic identity lookup. `entity_id`, `authority_id`, `action`, `resource`, material qualification, evaluation time and declared decision-critical context form the decision boundary as applicable. Semantic `positive`, `negative`, `indeterminate` and `not-applicable` results are distinct from HTTP/processing status. Required profiles and critical semantics must be negotiated before evaluation; they cannot be silently removed or downgraded to generic v2 processing.
+
+For agentic use, runtime agent identity, represented principal/controller, authority, verification material, delegation evidence, action and resource must remain distinguishable. See [`API.md`](API.md#8-agentic-parameter-interpretation) for the developer-facing mapping.
 
 ## v2 baseline
 

@@ -1,0 +1,196 @@
+openapi: 3.1.0
+info:
+  title: TRQP v3 Downstream Candidate HTTP API
+  version: 3.0.0-candidate
+  description: >-
+    Downstream candidate HTTP binding for the proposed TRQP v3 semantic contract.
+    This is not an adopted Trust Over IP API. Transport success is distinct from
+    semantic decision state and candidate-critical requests must not silently downgrade to v2.
+paths:
+  /trqp/v3/query:
+    post:
+      summary: Evaluate a bounded trust-registry proposition
+      operationId: evaluateTrustRegistryProposition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QualifiedRequest'
+      responses:
+        '200':
+          description: Semantic evaluation completed; inspect decision.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticResponse'
+        '400':
+          description: Malformed or contradictory candidate request.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '406':
+          description: Required version, profile, or critical semantics cannot be negotiated.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Mandatory processing/profile obligations conflict.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Declared critical semantics cannot be evaluated under the active contract.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          description: Required authoritative service/evidence is unavailable; not a semantic negative.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  schemas:
+    QualifiedRequest:
+      type: object
+      additionalProperties: false
+      required: [trqp_version, entity_id, authority_id, action, resource]
+      properties:
+        trqp_version:
+          type: string
+          const: 3.0-candidate
+          description: Requested downstream candidate processing contract.
+        entity_id:
+          type: string
+          minLength: 1
+          description: Semantic entity/principal being evaluated; not implicitly endpoint or controller identity.
+        authority_id:
+          type: string
+          minLength: 1
+          description: Authority or trust-registry scope for the proposition.
+        action:
+          type: string
+          minLength: 1
+          description: Exact action being evaluated.
+        resource:
+          type: string
+          minLength: 1
+          description: Exact resource/object being evaluated.
+        context:
+          type: object
+          additionalProperties: true
+          properties:
+            time:
+              type: string
+              format: date-time
+            verification_material:
+              type: string
+              minLength: 1
+        critical_context:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 1
+          description: Context members whose semantics must not be ignored.
+        required_profiles:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 1
+          description: Profiles whose mandatory processing semantics must be established before evaluation.
+      allOf:
+        - if:
+            required: [critical_context]
+            properties:
+              critical_context:
+                contains:
+                  const: verification_material
+          then:
+            required: [context]
+            properties:
+              context:
+                required: [verification_material]
+        - if:
+            required: [context]
+            properties:
+              context:
+                required: [verification_material]
+          then:
+            required: [critical_context]
+            properties:
+              critical_context:
+                contains:
+                  const: verification_material
+    SemanticResponse:
+      type: object
+      required: [decision, reason, evaluation_time, evidence_state]
+      properties:
+        decision:
+          type: string
+          enum: [positive, negative, indeterminate, not-applicable]
+        reason:
+          type: string
+          minLength: 1
+        authorized:
+          type: [boolean, 'null']
+        recognized:
+          type: [boolean, 'null']
+          description: Direct recognition only unless an explicit future propagation rule applies.
+        evaluation_time:
+          type: string
+          format: date-time
+        evidence_state:
+          type: string
+          enum: [sufficient, incomplete, stale, unavailable, non-authoritative, conflicting, unknown]
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/Evidence'
+    Evidence:
+      type: object
+      additionalProperties: true
+      properties:
+        source_id:
+          type: string
+        authoritative:
+          type: boolean
+        complete_for_scope:
+          type: boolean
+        effective_from:
+          type: string
+          format: date-time
+        effective_until:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      description: RFC 9457-style processing/transport problem; never a semantic negative by itself.
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+        unsupported_critical_context:
+          type: array
+          items: { type: string }
+        unsupported_profiles:
+          type: array
+          items: { type: string }
