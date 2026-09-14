@@ -1,0 +1,97 @@
+ledger_version: 1
+scope: downstream-trqp-v3-candidate
+authority:
+  upstream_adoption_claimed: false
+  stable_v2_branch: main
+  candidate_branch: draft/next-trqp
+
+dispositions:
+  allowed: [retained, changed, superseded, removed-with-rationale, profile, deferred]
+
+v2:
+  - id: V2-AUTHORIZATION
+    disposition: changed
+    candidate: exact-bounded-proposition
+  - id: V2-RECOGNITION
+    disposition: changed
+    candidate: direct-recognition-only
+  - id: V2-DELEGATION-TYPE
+    disposition: changed
+    candidate: external-delegation-evidence
+  - id: V2-AUTHORITY-ID
+    disposition: retained
+  - id: V2-ENTITY-ID
+    disposition: changed
+    candidate: uri-identity-plus-material-profile
+  - id: V2-ACTION
+    disposition: retained
+  - id: V2-RESOURCE
+    disposition: retained
+  - id: V2-READ-ONLY
+    disposition: retained
+  - id: V2-HTTPS-BINDING
+    disposition: retained
+  - id: V2-AUTHZ-REQUEST-SCHEMA
+    disposition: changed
+  - id: V2-AUTHZ-RESPONSE-SCHEMA
+    disposition: changed
+  - id: V2-RECOGNITION-REQUEST-SCHEMA
+    disposition: changed
+  - id: V2-RECOGNITION-RESPONSE-SCHEMA
+    disposition: changed
+  - id: V2-SECURITY
+    disposition: changed
+  - id: V2-PRIVACY
+    disposition: changed
+  - id: V2-CONFORMANCE
+    disposition: changed
+  - id: V2-VERSIONING
+    disposition: changed
+
+upstream_backlog:
+  - issue: 176
+    topic: lifecycle-revocation
+    disposition: changed
+    rc: accounted
+  - issue: 177
+    topic: discovery
+    disposition: changed
+    rc: accounted
+    external_gate: G4
+  - issue: 178
+    topic: transport-extensibility
+    disposition: changed
+    rc: accounted
+    external_gate: G4
+  - issue: 179
+    topic: credential-ecosystem-integration
+    disposition: profile
+    rc: non-core
+  - issue: 180
+    topic: operational-guidance
+    disposition: retained
+    rc: accounted
+  - issue: 181
+    topic: governance-metadata-profiles
+    disposition: profile
+    rc: non-core
+  - issue: 182
+    topic: recognition-semantics
+    disposition: changed
+    rc: accounted
+  - issue: 183
+    topic: security-profiles
+    disposition: profile
+    rc: non-core
+  - issue: 194
+    topic: pki-identifiers
+    disposition: profile
+    rc: extension-point-accounted
+
+release_assertions:
+  v2_normative_capabilities_accounted_for: true
+  v2_schemas_accounted_for: 4
+  v2_binding_accounted_for: true
+  upstream_backlog_dispositioned: true
+  unaccounted_v2_behavior: 0
+  unaccounted_upstream_backlog: 0
