@@ -30,7 +30,7 @@ test('well-known transport returns the same transport-independent capability sem
 test('successful HTTP retrieval cannot rescue stale capability metadata', () => {
   const result = resolveWellKnownResponse({
     origin: 'https://registry.example', status: 200, content_type: 'application/json',
-    body: { ...body, expires_at: '2026-09-13T00:00:00Z' }
+    body: { ...body, issued_at: '2026-09-12T00:00:00Z', expires_at: '2026-09-13T00:00:00Z' }
   }, options);
   assert.deepEqual(result, { resolved: false, reason: 'stale-capability-metadata' });
 });
