@@ -5,11 +5,12 @@ const root = process.cwd();
 const read = p => fs.readFileSync(path.join(root, p), 'utf8');
 const fail = msg => { console.error(`RC readiness failure: ${msg}`); process.exitCode = 1; };
 
-const req = read('development/next-draft/NORMATIVE-REQUIREMENTS.md');
-const trace = read('development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md');
-const examples = read('development/next-draft/examples/README.md');
-const schemaRec = read('development/next-draft/SCHEMA-RECONCILIATION.md');
-const op = read('development/next-draft/OPERATIONAL-GUIDANCE.md');
+// Reader-facing v3 product artifacts are authoritative for candidate readiness.
+const req = read('specification/v3/conformance/REQUIREMENTS.md');
+const trace = read('specification/v3/conformance/TRACEABILITY.md');
+const examples = read('specification/v3/examples/README.md');
+const schemaRec = read('development/evidence/v3/SCHEMA-RECONCILIATION.md');
+const op = read('specification/v3/guides/OPERATIONAL-GUIDANCE.md');
 const requestSchema = JSON.parse(read('development/verification-material/schemas/wp7-request.schema.json'));
 const responseSchema = JSON.parse(read('development/verification-material/schemas/wp7-response.schema.json'));
 
@@ -36,12 +37,15 @@ if (!schemaRec.includes('semantic_field_loss_allowed: false')) fail('schema reco
 if (!trace.includes('SHOULD accounting rule')) fail('SHOULD accounting rule absent');
 if (!op.includes('Release-readiness checklist')) fail('operational release-readiness checklist absent');
 
+// Scan the public candidate product plus the evidence artifact that constrains
+// schema reconciliation. Development evidence is supporting material, not an
+// alternate normative specification surface.
 const controlled = [
-  'development/next-draft/CANDIDATE-TRQP-V3.md',
-  'development/next-draft/NORMATIVE-REQUIREMENTS.md',
-  'development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md',
-  'development/next-draft/SCHEMA-RECONCILIATION.md',
-  'development/next-draft/OPERATIONAL-GUIDANCE.md'
+  'specification/v3/TRQP-V3.md',
+  'specification/v3/conformance/REQUIREMENTS.md',
+  'specification/v3/conformance/TRACEABILITY.md',
+  'development/evidence/v3/SCHEMA-RECONCILIATION.md',
+  'specification/v3/guides/OPERATIONAL-GUIDANCE.md'
 ];
 const unresolved = /\b(TODO|TBD|FIXME|XXX)\b/;
 for (const p of controlled) {
