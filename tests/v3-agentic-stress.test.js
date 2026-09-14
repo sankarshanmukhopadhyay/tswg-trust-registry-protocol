@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict'); const test=require('node:test');
+const {evaluateDelegatedAuthority,compositionAuthorizes}=require('../development/verification-material/agentic');
+const base={agent_id:'agent:A',principal_id:'person:P',action:'purchase',resource:'item:X',time:'2026-09-14T10:00:00Z',delegation:{agent_id:'agent:A',principal_id:'person:P',action:'purchase',resource:'item:X',valid_from:'2026-09-14T00:00:00Z',valid_until:'2026-09-15T00:00:00Z'}};
+const expect=(q,d,r)=>{const x=evaluateDelegatedAuthority(q);assert.equal(x.decision,d);if(r)assert.equal(x.reason,r)};
+test('exact delegated proposition is positive',()=>expect(base,'positive'));
+test('wrong agent/principal binding is negative',()=>expect({...base,agent_id:'agent:B'},'authoritative-negative','wrong-principal'));
+test('wrong action is negative',()=>expect({...base,action:'transfer'},'authoritative-negative','wrong-purpose'));
+test('wrong resource is negative',()=>expect({...base,resource:'item:Y'},'authoritative-negative','wrong-resource'));
+test('expired delegation is negative',()=>expect({...base,time:'2026-09-16T00:00:00Z'},'authoritative-negative','expired'));
+test('revoked delegation is negative after revocation',()=>expect({...base,delegation:{...base.delegation,revoked_at:'2026-09-14T09:00:00Z'}},'authoritative-negative','revoked'));
+test('historical query before revocation remains positive',()=>expect({...base,time:'2026-09-14T08:00:00Z',delegation:{...base.delegation,revoked_at:'2026-09-14T09:00:00Z'}},'positive'));
+test('revoked intermediate delegation is negative',()=>expect({...base,delegation:{...base.delegation,chain:[{allow_onward:true,revoked_at:'2026-09-14T09:00:00Z'},{allow_onward:true}]}},'authoritative-negative','revoked'));
+test('prohibited onward delegation is negative',()=>expect({...base,delegation:{...base.delegation,chain:[{allow_onward:false},{allow_onward:true}]}},'authoritative-negative','onward-delegation-prohibited'));
+test('unsupported critical delegation context is indeterminate',()=>expect({...base,required_context:['amount'],context:{}},'indeterminate','unsupported-critical-context'));
+test('capability alone never manufactures authority',()=>expect({...base,capability_only:true},'indeterminate','evidence-incomplete'));
+test('agent replacement does not rewrite historical binding',()=>{const x=evaluateDelegatedAuthority(base);assert.equal(x.binding.agent_id,'agent:A');assert.notEqual(x.binding.agent_id,'agent:A2')});
+test('valid components with mismatched proposition do not compose',()=>assert.equal(compositionAuthorizes({identity:true,capability:true,delegation:base.delegation,recognition:{subject_id:'merchant:M'},proposition:{agent_id:'agent:A',principal_id:'person:P',action:'purchase',resource:'item:Y',counterparty_id:'merchant:M'}}),false));
+test('recognized delegator does not imply recognition of delegate',()=>assert.equal(compositionAuthorizes({identity:true,capability:true,delegation:base.delegation,recognition:{subject_id:'person:P'},proposition:{agent_id:'agent:A',principal_id:'person:P',action:'purchase',resource:'item:X',counterparty_id:'agent:A'}}),false));
