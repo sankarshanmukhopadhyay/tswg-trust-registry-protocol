@@ -5,10 +5,20 @@ const root = process.cwd();
 const read = p => fs.readFileSync(path.join(root, p), 'utf8');
 const fail = msg => { console.error(`RC readiness failure: ${msg}`); process.exitCode = 1; };
 
+const walkFiles = dir => {
+  const abs = path.join(root, dir);
+  return fs.readdirSync(abs, { withFileTypes: true }).flatMap(entry => {
+    const rel = path.join(dir, entry.name);
+    return entry.isDirectory() ? walkFiles(rel) : [rel];
+  });
+};
+
 // Reader-facing v3 product artifacts are authoritative for candidate readiness.
+const spec = read('specification/v3/TRQP-V3.md');
 const req = read('specification/v3/conformance/REQUIREMENTS.md');
 const trace = read('specification/v3/conformance/TRACEABILITY.md');
 const examples = read('specification/v3/examples/README.md');
+const implementers = read('specification/v3/guides/IMPLEMENTERS-GUIDE.md');
 const schemaRec = read('development/evidence/v3/SCHEMA-RECONCILIATION.md');
 const op = read('specification/v3/guides/OPERATIONAL-GUIDANCE.md');
 const requestSchema = JSON.parse(read('development/verification-material/schemas/wp7-request.schema.json'));
@@ -37,6 +47,47 @@ if (!schemaRec.includes('semantic_field_loss_allowed: false')) fail('schema reco
 if (!trace.includes('SHOULD accounting rule')) fail('SHOULD accounting rule absent');
 if (!op.includes('Release-readiness checklist')) fail('operational release-readiness checklist absent');
 
+// Standards/editorial adoption controls: the public candidate must be understandable
+// as a specification, not only as a requirement ledger.
+for (const marker of [
+  '## Abstract',
+  '## Status of this document',
+  '### 1.1 Design goals',
+  '### 1.2 Non-goals',
+  '### 1.4 Terminology',
+  '### 1.5 Architecture and roles',
+  '## 16. Security considerations',
+  '## 17. Privacy considerations',
+  '## 27. IANA considerations',
+  '## 28. References'
+]) {
+  if (!spec.includes(marker)) fail(`normative specification missing editorial/standards marker: ${marker}`);
+}
+if (!spec.includes('BCP 14') || !spec.includes('RFC 2119') || !spec.includes('RFC 8174')) {
+  fail('normative specification missing BCP 14 / RFC 2119 / RFC 8174 requirements-language convention');
+}
+
+for (const adoptionMarker of [
+  'Recommended processing pipeline',
+  'Evidence model',
+  'Caching',
+  'Audit and redress',
+  'Adoption checklist'
+]) {
+  if (!implementers.includes(adoptionMarker)) fail(`implementer guide missing adoption section: ${adoptionMarker}`);
+}
+
+for (const exampleMarker of [
+  'Ordinary positive authorization',
+  'Verification-material mismatch',
+  'Evidence unavailable',
+  'Material-qualified historical request',
+  'Agent acting for a principal',
+  'Failed candidate negotiation'
+]) {
+  if (!examples.includes(exampleMarker)) fail(`worked example corpus missing flow: ${exampleMarker}`);
+}
+
 // Scan the public candidate product plus the evidence artifact that constrains
 // schema reconciliation. Development evidence is supporting material, not an
 // alternate normative specification surface.
@@ -53,4 +104,10 @@ for (const p of controlled) {
   if (unresolved.test(text)) fail(`unresolved editorial marker in ${p}`);
 }
 
-if (!process.exitCode) console.log(`RC readiness controls passed: ${ids.length} stable requirement IDs; schema/prose/traceability controls coherent.`);
+// The retired work-packet path must never leak back into the public product surface.
+for (const p of walkFiles('specification/v3').filter(p => /\.(md|ya?ml|json)$/i.test(p))) {
+  const text = read(p);
+  if (text.includes('development/next-draft/')) fail(`stale development/next-draft reference in public candidate artifact: ${p}`);
+}
+
+if (!process.exitCode) console.log(`RC readiness controls passed: ${ids.length} stable requirement IDs; schema/prose/traceability/adoption controls coherent.`);
