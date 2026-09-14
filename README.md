@@ -2,13 +2,13 @@
 
 > **Branch status:** `draft/next-trqp` is the dedicated downstream TRQP v3 candidate. It is intended for review, implementation and interoperability work without changing the repository's stable `main` branch. This is not an adopted Trust Over IP specification.
 
-## Read the proposed v3
+## Proposed v3
 
-**Start with the public specification entry point:** [`specification/v3/README.md`](specification/v3/README.md)
+**Start here: [`specification/v3/`](specification/v3/)**
 
-The complete normative specification text is linked there, together with the schemas, examples, implementation guidance and conformance evidence needed to understand how the proposed protocol is intended to behave.
+That directory is the complete public product surface for the proposed v3. It contains the normative specification, API documentation, OpenAPI contract, implementation and migration guides, conformance material, examples and schema discovery.
 
-If you want to answer **“what would a fully fledged TRQP v3 look, read and behave like?”**, this branch is the reviewable artifact.
+If you want to answer **“what would a fully fledged TRQP v3 look, read and behave like?”**, review `specification/v3/` on this branch.
 
 ## Branch model
 
@@ -22,21 +22,28 @@ draft/next-trqp
 
 Completion of the v3 candidate **does not imply promotion to `main`**. Any future adoption, upstream contribution or replacement of the stable downstream line is a separate governance decision.
 
-## Candidate package
+## Reader map
 
-| Need | Artifact |
+| Goal | Start here |
 |---|---|
-| Read the proposed specification | [`specification/v3/README.md`](specification/v3/README.md) |
-| Full normative candidate text | [`development/next-draft/CANDIDATE-TRQP-V3.md`](development/next-draft/CANDIDATE-TRQP-V3.md) |
-| Stable normative requirement IDs | [`development/next-draft/NORMATIVE-REQUIREMENTS.md`](development/next-draft/NORMATIVE-REQUIREMENTS.md) |
-| Request/response schemas | [`development/verification-material/schemas/`](development/verification-material/schemas/) |
-| Candidate examples | [`development/next-draft/examples/`](development/next-draft/examples/) |
-| Implementation guidance | [`development/next-draft/IMPLEMENTERS-GUIDE.md`](development/next-draft/IMPLEMENTERS-GUIDE.md) |
-| Migrate from v2 | [`development/next-draft/V2-TO-V3-MIGRATION-GUIDE.md`](development/next-draft/V2-TO-V3-MIGRATION-GUIDE.md) |
-| Conformance/interoperability | [`development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md`](development/next-draft/CONFORMANCE-AND-INTEROP-GUIDE.md) |
-| Agentic-system use | [`development/next-draft/AGENTIC-USAGE-GUIDE.md`](development/next-draft/AGENTIC-USAGE-GUIDE.md) |
-| Operational guidance | [`development/next-draft/OPERATIONAL-GUIDANCE.md`](development/next-draft/OPERATIONAL-GUIDANCE.md) |
-| Requirement → test evidence | [`development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md`](development/next-draft/REQUIREMENT-TEST-TRACEABILITY.md) |
+| Read the protocol | [`specification/v3/TRQP-V3.md`](specification/v3/TRQP-V3.md) |
+| Understand the API and parameters | [`specification/v3/API.md`](specification/v3/API.md) |
+| Consume the machine-readable API | [`specification/v3/openapi.yaml`](specification/v3/openapi.yaml) |
+| Implement v3 | [`specification/v3/guides/IMPLEMENTERS-GUIDE.md`](specification/v3/guides/IMPLEMENTERS-GUIDE.md) |
+| Migrate from v2 | [`specification/v3/guides/MIGRATION-FROM-V2.md`](specification/v3/guides/MIGRATION-FROM-V2.md) |
+| Use TRQP with agents | [`specification/v3/guides/AGENTIC-USAGE.md`](specification/v3/guides/AGENTIC-USAGE.md) |
+| Understand operations | [`specification/v3/guides/OPERATIONAL-GUIDANCE.md`](specification/v3/guides/OPERATIONAL-GUIDANCE.md) |
+| Evaluate conformance | [`specification/v3/conformance/`](specification/v3/conformance/) |
+| Browse examples | [`specification/v3/examples/`](specification/v3/examples/) |
+| Inspect engineering evidence/history | [`development/`](development/) |
+
+## Information architecture and authority
+
+The repository deliberately separates **the specification product** from **the evidence used to develop and assure it**.
+
+`specification/v3/` is what a reviewer or implementer should read. `development/` contains research, work-packet evidence, upstream dispositions, verification material and provenance. Development artifacts do not silently extend the normative specification.
+
+Approved v2 material remains under [`specification/v2-approved/`](specification/v2-approved/) as the stable baseline, migration reference and provenance record.
 
 ## What the candidate changes
 
@@ -48,18 +55,10 @@ Agentic use is a mandatory stress lens, not an expansion of TRQP into an agent p
 
 ## Validation and assurance
 
-This branch carries executable downstream evidence under `tests/` and `development/verification-material/`. CI runs the downstream reference-model suite and RC-readiness controls covering requirement-family traceability, candidate schema surfaces, SHOULD disposition, unresolved editorial markers and semantic-field-loss protections.
-
-Local differential tests demonstrate repository-local consistency. They **do not** constitute independent organizational interoperability, and this branch does not claim otherwise.
+Executable downstream evidence remains under `tests/` and `development/verification-material/`. CI runs the downstream reference-model suite and RC-readiness controls. Local differential tests demonstrate repository-local consistency; they **do not** constitute independent organizational interoperability.
 
 ## Authority boundary
 
 The branch is a downstream proposal. Final upstream adoption, major-version/profile naming, final schema identifiers/member spelling, production binding selection and independent external interoperability remain outside downstream authority.
 
-Approved v2 material remains under [`specification/v2-approved/`](specification/v2-approved/) as the stable baseline, migration reference and provenance record. Its presence on this branch does not make v2 the implementation target for the proposed v3.
-
-## Development evidence
-
-`development/` retains engineering evidence, dispositions, traceability and supporting material used to derive and test the candidate. Those files are auditable provenance, not hidden normative extensions. A reviewer should not need issue or pull-request history to determine candidate protocol behavior.
-
-Changes to the candidate should use short-lived branches targeting `draft/next-trqp`, with modular commits and executable tests wherever behavior can be tested. `main` remains stable unless a separate explicit governance decision changes that policy.
+Changes to the candidate should use short-lived branches targeting `draft/next-trqp`, with modular commits and executable tests wherever behavior can be tested.
