@@ -1,10 +1,19 @@
 'use strict';
 
-const DECISIONS = new Set(['positive', 'authoritative-negative', 'indeterminate']);
+const DECISIONS = new Set(['positive', 'authoritative-negative', 'indeterminate', 'not-applicable']);
 const REASONS = Object.freeze({
-  POSITIVE: new Set(['evidence-supports-proposition']),
-  AUTHORITATIVE_NEGATIVE: new Set(['not-listed', 'not-applicable', 'revoked', 'expired', 'superseded', 'wrong-purpose', 'wrong-resource', 'material-mismatch']),
-  INDETERMINATE: new Set(['evidence-incomplete', 'evidence-stale', 'evidence-unavailable', 'historical-evidence-incomplete', 'unsupported-critical-context', 'required-profile-unsupported', 'profile-contract-unsatisfied', 'conflicting-evidence'])
+  POSITIVE: new Set(['established', 'evidence-supports-proposition']),
+  AUTHORITATIVE_NEGATIVE: new Set(['not-listed', 'revoked', 'expired', 'superseded', 'wrong-purpose', 'wrong-resource', 'material-mismatch']),
+  NOT_APPLICABLE: new Set(['outside-scope', 'not-applicable']),
+  INDETERMINATE: new Set(['evidence-incomplete', 'evidence-stale', 'source-unavailable', 'source-non-authoritative', 'evidence-conflicting', 'evidence-unknown', 'evidence-unavailable', 'historical-evidence-incomplete', 'unsupported-critical-context', 'required-profile-unsupported', 'profile-contract-unsatisfied', 'conflicting-evidence'])
+});
+const EVIDENCE_REASON_STATE = Object.freeze({
+  'evidence-stale': 'stale',
+  'evidence-incomplete': 'incomplete',
+  'source-unavailable': 'unavailable',
+  'source-non-authoritative': 'non-authoritative',
+  'evidence-conflicting': 'conflicting',
+  'evidence-unknown': 'unknown'
 });
 
 function nonEmpty(value) { return typeof value === 'string' && value.trim().length > 0; }
@@ -29,6 +38,7 @@ function validateRequest(value) {
 function validReason(decision, reason) {
   if (decision === 'positive') return REASONS.POSITIVE.has(reason);
   if (decision === 'authoritative-negative') return REASONS.AUTHORITATIVE_NEGATIVE.has(reason);
+  if (decision === 'not-applicable') return REASONS.NOT_APPLICABLE.has(reason);
   if (decision === 'indeterminate') return REASONS.INDETERMINATE.has(reason);
   return false;
 }
@@ -44,7 +54,10 @@ function validateResponse(value) {
   if (!Array.isArray(value.evidence)) errors.push('evidence must be an array');
   if (value.decision === 'positive' && value.authorized !== true && value.recognized !== true) errors.push('positive decision requires a positive core boolean');
   if (value.decision === 'authoritative-negative' && (value.authorized === true || value.recognized === true)) errors.push('authoritative-negative decision cannot carry a positive core boolean');
-  if (value.decision === 'indeterminate' && (value.authorized === true || value.recognized === true)) errors.push('indeterminate decision cannot carry a positive core boolean');
+  if ((value.decision === 'indeterminate' || value.decision === 'not-applicable') && (value.authorized === true || value.recognized === true)) errors.push(`${value.decision} decision cannot carry a positive core boolean`);
+  if (value.decision === 'positive' && value.evidence_state !== 'sufficient') errors.push('positive decision requires sufficient evidence_state');
+  if (value.decision === 'not-applicable' && value.evidence_state !== 'sufficient') errors.push('not-applicable decision requires sufficient evidence_state');
+  if (Object.hasOwn(EVIDENCE_REASON_STATE, value.reason) && value.evidence_state !== EVIDENCE_REASON_STATE[value.reason]) errors.push('evidence_state does not match reason');
   for (const evidence of Array.isArray(value.evidence) ? value.evidence : []) {
     if (!nonEmpty(evidence.source_id)) errors.push('evidence.source_id is required');
     if (typeof evidence.authoritative !== 'boolean') errors.push('evidence.authoritative is required');
@@ -53,4 +66,4 @@ function validateResponse(value) {
   return { valid: errors.length === 0, errors };
 }
 
-module.exports = { REASONS, validateRequest, validateResponse };
+module.exports = { REASONS, EVIDENCE_REASON_STATE, validateRequest, validateResponse };
