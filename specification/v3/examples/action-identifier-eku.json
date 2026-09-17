@@ -1,0 +1,16 @@
+{
+  "trqp_version": "3.0-candidate",
+  "entity_id": "did:example:publisher",
+  "authority_id": "did:example:software-trust-registry",
+  "action": "urn:oid:1.3.6.1.5.5.7.3.3",
+  "resource": "urn:artifact:release:example-1",
+  "critical_context": [
+    "verification_material"
+  ],
+  "context": {
+    "verification_material": "urn:sha256:codesigning-cert"
+  },
+  "required_profiles": [
+    "trqp-v3-action-identifiers"
+  ]
+}
