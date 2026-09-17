@@ -39,6 +39,12 @@ This register assigns stable downstream identifiers to the candidate's release-s
 | TRQP3-AUD-001 | 18 | Audit evidence supports proposition/time/contract/evidence/result reconstruction and redress. | audit-survival/agent-replacement vector |
 | TRQP3-COMP-001 | 20 | Migration is explicit negotiation; syntactic legacy acceptance is not semantic compatibility. | v2/v3 differential corpus |
 
+## Binding-scoped conformance requirements
+
+Optional transport bindings MAY define additional requirement families scoped to a binding-specific conformance claim. Such requirements do not make the binding mandatory for core TRQP v3 conformance and MUST NOT redefine the semantic obligations above.
+
+The experimental TSP binding defines the `TRQP3-TSP-*` family in [`../bindings/tsp/TRQP-TSP-BINDING.md`](../bindings/tsp/TRQP-TSP-BINDING.md). A claim of **TRQP v3 TSP Binding** conformance is accountable against that family in addition to applicable core requirements.
+
 ## Release rule
 
 A normative candidate obligation is release-accounted only when it has: (1) a stable ID, (2) a normative prose location, (3) schema impact disposition where applicable, and (4) positive/negative machine-verifiable evidence or an explicit rationale where machine verification is not applicable.
