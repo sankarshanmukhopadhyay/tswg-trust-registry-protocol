@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const { validateRequest, validateResponse } = require('../development/verification-material/wp7-conformance');
+const { validateRequest, validateResponse } = require('../development/verification-material/conformance');
 
 function request(overrides = {}) {
   return { trqp_version: '3.0-candidate', entity_id: 'did:example:issuer-a', authority_id: 'did:example:authority', action: 'issue', resource: 'credential-type-x', context: { verification_material: 'urn:sha256:c2', time: '2026-06-01T00:00:00Z' }, critical_context: ['verification_material', 'time'], ...overrides };

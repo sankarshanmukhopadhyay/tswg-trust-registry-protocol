@@ -2,7 +2,7 @@
 
 Status: **downstream reconciliation record; not normative TRQP**
 
-This document reconciles the evidence-backed downstream candidate propositions in `development/verification-material/WP8-candidate-spec-synthesis.md` against known upstream TRQP work. It is an authority and traceability record, not a claim that an upstream issue constitutes acceptance.
+This document reconciles the evidence-backed downstream candidate propositions against known upstream TRQP work. It is an authority and traceability record, not a claim that an upstream issue constitutes acceptance.
 
 ## Authority rule
 
@@ -37,19 +37,19 @@ No proposition is marked upstream-reconciled merely because a related issue exis
 | NTRQP-13 major-version/profile boundary | #181/#183 plus approved v2 versioning behaviour | unresolved | Version ownership is upstream. Downstream evidence establishes a breaking-processing hazard but cannot assign the upstream version number. | Preserve “candidate major-version semantic change” language; do not claim TRQP 3.0 as adopted. |
 | NTRQP-14 wire names, reasons, discovery/negotiation, migration | #177, #181/#183, #194; #178 where transport separation matters | unresolved | Multiple upstream work items affect the mechanism, but exact normative composition is unsettled. | Keep wire vocabulary and migration rules experimental. |
 
-## Adjacent upstream work not yet promotable into candidate requirements
+## Adjacent upstream work
 
 ### Transport independence — upstream #178
 
-The upstream direction is supportive of separating core semantics from transport binding. Historical #174/#82/#56/#118 provide provenance. This is relevant to the next draft architecture, but the WP8 proposition set does not currently contain an independently evidenced transport-independence requirement. It therefore remains adjacent work rather than being silently added as a promoted candidate requirement.
+The upstream direction supports separation of core semantics from transport binding. Downstream executable evidence now includes `development/verification-material/transport-binding.js` and `tests/s21-09-transport-profile-boundary.test.js`. Upstream authority is still required before normative adoption.
 
 ### Endpoint/capability discovery — upstream #177
 
-Discovery is relevant to capability/profile negotiation and migration. The current downstream evidence does not yet establish an executable discovery contract. Discovery therefore remains unresolved mechanism work under NTRQP-14 rather than a separately promoted behavioural requirement.
+Discovery remains separate from authorization and recognition semantics. Downstream executable evidence is carried by the discovery verification modules and S21-05 tests; concrete upstream discovery vocabulary remains unresolved.
 
 ### Recognition semantics — upstream #182
 
-Recognition modeling and proof propagation are directly relevant to trust-registry semantics. The downstream candidate must not infer recognition transitivity merely from graph connectivity. No new recognition proposition is promoted here without executable/falsification evidence.
+Recognition modeling and proof propagation are directly relevant to trust-registry semantics. The downstream candidate must not infer recognition transitivity merely from graph connectivity. Additional normative upstream disposition remains required.
 
 ### Governance/security profiles — upstream #181/#183
 
@@ -57,9 +57,7 @@ Profiles may strengthen governance or security assurance without redefining the 
 
 ## Compatibility judgment
 
-The upstream reconciliation does not remove the WP7/WP8 compatibility finding.
-
-The downstream falsification boundary is semantic: a legacy processor allowed to ignore an unknown optional condition can evaluate a broader proposition than the requester intended. Adding a syntactically optional field or profile label does not solve that problem unless the receiving peer is already bound to understand and enforce the relevant processing obligation.
+The downstream compatibility finding is semantic: a legacy processor allowed to ignore an unknown optional condition can evaluate a broader proposition than the requester intended. Adding a syntactically optional field or profile label does not solve that problem unless the receiving peer is already bound to understand and enforce the relevant processing obligation.
 
 Therefore:
 

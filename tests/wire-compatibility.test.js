@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const { DECISIONS, REASONS, evaluateCompatibility, simulateLegacyV2 } = require('../development/verification-material/wp7-wire');
+const { DECISIONS, REASONS, evaluateCompatibility, simulateLegacyV2 } = require('../development/verification-material/wire');
 
 const base = {
   entity_id: 'did:example:issuer-a',

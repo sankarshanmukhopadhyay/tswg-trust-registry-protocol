@@ -12,7 +12,7 @@
 - **Examples:** [`examples/`](examples/)
 - **Schema discovery:** [`schemas/`](schemas/)
 
-Everything required to understand or begin implementing the proposed v3 is reachable from this directory. A reader should not need `development/`, issue history, pull requests, work-packet names or planning documents to determine protocol behavior.
+Everything required to understand or begin implementing the proposed v3 is reachable from this directory. A reader should not need development history, issue history, pull requests, or internal planning artifacts to determine protocol behavior.
 
 ## Authority map
 
@@ -23,8 +23,8 @@ Everything required to understand or begin implementing the proposed v3 is reach
 | [`conformance/`](conformance/) | Stable requirement IDs, coverage and interoperability expectations | Derived conformance controls |
 | [`guides/`](guides/) | Implementation, migration, agentic and operational explanation | Informative |
 | [`examples/`](examples/) | Worked usage | Informative/test-supporting |
-| [`../../tests/`](../../tests/) and `development/verification-material/` | Executable verification | Assurance evidence |
-| [`../../development/`](../../development/) | Research, dispositions, work packets and provenance | **Not specification** |
+| [`../../tests/`](../../tests/) and `../../development/verification-material/` | Executable verification | Assurance evidence |
+| [`../../development/evidence/v3/`](../../development/evidence/v3/) | Reconciliation, semantic dispositions and provenance | **Not specification** |
 
 If a development/evidence artifact appears to introduce normative protocol behavior absent from `TRQP-V3.md`, that is a specification defect to reconcile; it is not a hidden extension of v3.
 
@@ -67,4 +67,4 @@ Approved v2 material remains under [`../v2-approved/`](../v2-approved/) as the s
 
 **Agentic use:** `guides/AGENTIC-USAGE.md` → agentic sections of `TRQP-V3.md` → API identity/authority mapping.
 
-**Audit development history:** leave this product surface and inspect `development/evidence/v3/` and `development/verification-material/`.
+**Audit development history:** inspect `development/evidence/v3/`, `development/verification-material/`, linked issues, and pull requests. The candidate specification itself does not depend on reconstruction of internal development sequencing.
