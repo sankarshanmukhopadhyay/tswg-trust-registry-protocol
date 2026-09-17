@@ -1,0 +1,15 @@
+{
+  "protocol": "trqp",
+  "protocol_version": "3.0-candidate",
+  "binding": "tsp",
+  "message_type": "problem",
+  "message_id": "urn:uuid:33333333-3333-4333-8333-333333333333",
+  "in_reply_to": "urn:uuid:11111111-1111-4111-8111-111111111111",
+  "body": {
+    "type": "urn:trqp:problem:tsp-context-mismatch",
+    "title": "TSP-derived critical context mismatch",
+    "code": "tsp-critical-context-mismatch",
+    "detail": "The authenticated TSP sender VID does not match the decision-critical requester_vid declared by the TRQP proposition.",
+    "failed_requirement": "TRQP3-TSP-006"
+  }
+}
