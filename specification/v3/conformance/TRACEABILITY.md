@@ -17,6 +17,7 @@ The stable candidate requirement IDs are defined in [`REQUIREMENTS.md`](REQUIREM
 | `TRQP3-RESP-*` | semantic response interpretation | conformance and wire-compatibility tests | covered-local |
 | `TRQP3-NEG-*` | candidate negotiation and no silent v2 fallback | negotiation/migration tests | covered-local |
 | `TRQP3-BIND-*` | transport binding invariants | S21-09 transport/profile boundary tests | covered-local |
+| `TRQP3-TSP-*` | optional TSP binding: VID/semantic separation, correlation, fail-closed context, transport-failure separation | `tests/tsp-binding.test.js`; `development/verification-material/tsp-binding.js`; binding schema/examples | covered-local; independent TSP/TRQP interop external |
 | `TRQP3-DISC-*` | discovery distinct from authority; downgrade resistance | S21-05 capability, well-known and differential tests | covered-local; independent interop external |
 | `TRQP3-PROF-*` | profiles strengthen core; conflicts fail closed | S21-09 profile composition and negotiation tests | covered-local |
 | `TRQP3-REC-*` | recognition separation and non-transitivity | recognition/conformance tests; agentic non-transitivity vector | covered-local; positive propagation intentionally absent |
@@ -25,6 +26,10 @@ The stable candidate requirement IDs are defined in [`REQUIREMENTS.md`](REQUIREM
 | `TRQP3-PRIV-*` | minimization cannot broaden proposition | critical-context/minimization negatives | covered-local |
 | `TRQP3-AUD-*` | reconstructable decision and agent replacement | agentic audit/replacement vectors; operational guidance | covered-local |
 | `TRQP3-COMP-*` | explicit migration, no inferred compatibility | v2/candidate negotiation and migration tests | covered-local |
+
+## Binding-scoped traceability rule
+
+A binding-specific requirement family is additional to core TRQP conformance and MUST remain traceable to a binding specification, executable evidence, and an explicit external-interoperability boundary. Binding-local success MUST NOT be reported as independent interoperability with the external transport protocol.
 
 ## MUST accounting rule
 

@@ -17,6 +17,7 @@ const walkFiles = dir => {
 const spec = read('specification/v3/TRQP-V3.md');
 const req = read('specification/v3/conformance/REQUIREMENTS.md');
 const trace = read('specification/v3/conformance/TRACEABILITY.md');
+const coverage = read('specification/v3/conformance/COVERAGE.md');
 const examples = read('specification/v3/examples/README.md');
 const implementers = read('specification/v3/guides/IMPLEMENTERS-GUIDE.md');
 const schemaRec = read('development/evidence/v3/SCHEMA-RECONCILIATION.md');
@@ -86,12 +87,61 @@ for (const exampleMarker of [
   if (!examples.includes(exampleMarker)) fail(`worked example corpus missing flow: ${exampleMarker}`);
 }
 
+// Optional TSP binding readiness is scoped separately from core TRQP conformance.
+const tspBinding = read('specification/v3/bindings/tsp/TRQP-TSP-BINDING.md');
+const tspBindingReadme = read('specification/v3/bindings/tsp/README.md');
+const tspSchema = JSON.parse(read('specification/v3/bindings/tsp/schema.json'));
+const tspQuery = JSON.parse(read('specification/v3/bindings/tsp/examples/query.json'));
+const tspResponse = JSON.parse(read('specification/v3/bindings/tsp/examples/response.json'));
+const tspProblem = JSON.parse(read('specification/v3/bindings/tsp/examples/problem.json'));
+const tspTests = read('tests/tsp-binding.test.js');
+const tspReference = read('development/verification-material/tsp-binding.js');
+
+for (let i = 1; i <= 12; i += 1) {
+  const id = `TRQP3-TSP-${String(i).padStart(3, '0')}`;
+  if (!tspBinding.includes(id)) fail(`TSP binding missing scoped requirement ${id}`);
+}
+if (!trace.includes('TRQP3-TSP-*')) fail('TSP binding family missing from traceability');
+if (!coverage.includes('TRQP3-TSP-*')) fail('TSP binding family missing from coverage');
+if (!req.includes('TRQP3-TSP-*')) fail('TSP binding-scoped conformance family not registered');
+if (!tspBindingReadme.includes('downstream-only') || !tspBindingReadme.includes('experimental')) {
+  fail('TSP binding authority/status boundary is not explicit');
+}
+
+if (tspSchema.properties?.protocol?.const !== 'trqp') fail('TSP binding schema protocol is not frozen to trqp');
+if (tspSchema.properties?.protocol_version?.const !== '3.0-candidate') fail('TSP binding schema version is not frozen to candidate v3');
+if (tspSchema.properties?.binding?.const !== 'tsp') fail('TSP binding schema binding value is not frozen to tsp');
+if (tspSchema.additionalProperties !== false) fail('TSP binding envelope schema must be closed');
+
+for (const envelope of [tspQuery, tspResponse, tspProblem]) {
+  if (envelope.protocol !== 'trqp' || envelope.protocol_version !== '3.0-candidate' || envelope.binding !== 'tsp') {
+    fail('TSP binding example does not preserve binding envelope contract');
+  }
+}
+if (tspResponse.in_reply_to !== tspQuery.message_id) fail('TSP response example is not correlated to query');
+if (tspProblem.in_reply_to !== tspQuery.message_id) fail('TSP problem example is not correlated to query');
+if (Object.hasOwn(tspProblem.body || {}, 'decision')) fail('TSP problem example improperly carries semantic decision');
+
+for (const marker of ['projectTransportFacts','checkCriticalTransportContext','correlates','classifyTspFailure']) {
+  if (!tspReference.includes(marker)) fail(`TSP binding reference implementation missing ${marker}`);
+}
+for (const marker of [
+  'do not manufacture TRQP semantic identity or decision state',
+  'fails closed before semantic evaluation',
+  'does not imply TRQP recognition or authorization',
+  'transport failures remain processing failures rather than semantic negatives'
+]) {
+  if (!tspTests.includes(marker)) fail(`TSP binding executable assurance missing test: ${marker}`);
+}
+
 const controlled = [
   'specification/v3/TRQP-V3.md',
   'specification/v3/conformance/REQUIREMENTS.md',
   'specification/v3/conformance/TRACEABILITY.md',
   'development/evidence/v3/SCHEMA-RECONCILIATION.md',
-  'specification/v3/guides/OPERATIONAL-GUIDANCE.md'
+  'specification/v3/guides/OPERATIONAL-GUIDANCE.md',
+  'specification/v3/bindings/tsp/TRQP-TSP-BINDING.md',
+  'specification/v3/bindings/tsp/README.md'
 ];
 const unresolved = /\b(TODO|TBD|FIXME|XXX)\b/;
 for (const p of controlled) {
@@ -106,4 +156,4 @@ for (const p of walkFiles('specification/v3').filter(p => /\.(md|ya?ml|json)$/i.
   if (/\b(work[- ]packet|work[- ]tranche|restart checkpoint)\b/i.test(text)) fail(`internal execution vocabulary in public candidate artifact: ${p}`);
 }
 
-if (!process.exitCode) console.log(`RC readiness controls passed: ${ids.length} stable requirement IDs; schema/prose/traceability/adoption controls coherent.`);
+if (!process.exitCode) console.log(`RC readiness controls passed: ${ids.length} stable core requirement IDs; schema/prose/traceability/adoption controls coherent; experimental TSP binding accounted separately.`);

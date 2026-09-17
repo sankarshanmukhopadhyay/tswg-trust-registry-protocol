@@ -7,6 +7,7 @@
 - **Normative protocol specification:** [`TRQP-V3.md`](TRQP-V3.md)
 - **Developer API & parameter reference:** [`API.md`](API.md)
 - **Machine-readable candidate HTTP contract:** [`openapi.yaml`](openapi.yaml)
+- **Experimental transport bindings:** [`bindings/`](bindings/)
 - **Implementation and migration guides:** [`guides/`](guides/)
 - **Conformance requirements and evidence map:** [`conformance/`](conformance/)
 - **Examples:** [`examples/`](examples/)
@@ -20,6 +21,7 @@ Everything required to understand or begin implementing the proposed v3 is reach
 |---|---|---|
 | [`TRQP-V3.md`](TRQP-V3.md) | Protocol semantics | **Normative downstream candidate** |
 | [`API.md`](API.md), [`openapi.yaml`](openapi.yaml), [`schemas/`](schemas/) | Candidate HTTP/wire realization | Normative only where explicitly bound to `TRQP-V3.md`; downstream binding conventions remain non-adopted |
+| [`bindings/`](bindings/) | Optional transport bindings that preserve TRQP semantics | Binding-scoped downstream experiments; not core TRQP semantics and not upstream-adopted |
 | [`conformance/`](conformance/) | Stable requirement IDs, coverage and interoperability expectations | Derived conformance controls |
 | [`guides/`](guides/) | Implementation, migration, agentic and operational explanation | Informative |
 | [`examples/`](examples/) | Worked usage | Informative/test-supporting |
@@ -34,6 +36,8 @@ If a development/evidence artifact appears to introduce normative protocol behav
 
 The v3 designation, final upstream schema identifiers/member spelling, production binding selection and upstream adoption remain external authority decisions. The `/trqp/v3/query` path documented by the candidate OpenAPI contract is a downstream HTTP-binding convention, not an adopted upstream endpoint identifier.
 
+Optional bindings do not change the transport-neutral semantic core. A binding-specific conformance claim is additional to, and scoped separately from, core TRQP v3 conformance.
+
 ## Implementation package
 
 | Need | Artifact |
@@ -41,6 +45,7 @@ The v3 designation, final upstream schema identifiers/member spelling, productio
 | Read normative v3 semantics | [`TRQP-V3.md`](TRQP-V3.md) |
 | API operations and parameters | [`API.md`](API.md) |
 | OpenAPI 3.1 contract | [`openapi.yaml`](openapi.yaml) |
+| Experimental TSP binding | [`bindings/tsp/`](bindings/tsp/) |
 | Candidate schema discovery | [`schemas/`](schemas/) |
 | Stable normative requirement IDs | [`conformance/REQUIREMENTS.md`](conformance/REQUIREMENTS.md) |
 | Requirement → executable-evidence traceability | [`conformance/TRACEABILITY.md`](conformance/TRACEABILITY.md) |
@@ -62,6 +67,8 @@ Approved v2 material remains under [`../v2-approved/`](../v2-approved/) as the s
 **Review:** `TRQP-V3.md` → `API.md` → `conformance/`.
 
 **Implement:** `API.md` / `openapi.yaml` → `guides/IMPLEMENTERS-GUIDE.md` → `examples/` → tests.
+
+**Implement over TSP:** `TRQP-V3.md` → `bindings/tsp/TRQP-TSP-BINDING.md` → binding schema/examples → `tests/tsp-binding.test.js`.
 
 **Migrate:** `guides/MIGRATION-FROM-V2.md` → conformance controls.
 

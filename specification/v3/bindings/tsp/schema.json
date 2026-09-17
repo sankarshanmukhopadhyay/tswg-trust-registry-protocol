@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:trqp:v3-candidate:binding:tsp-envelope",
+  "title": "TRQP v3 candidate over TSP binding envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "protocol_version",
+    "binding",
+    "message_type",
+    "message_id",
+    "body"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "trqp"
+    },
+    "protocol_version": {
+      "const": "3.0-candidate"
+    },
+    "binding": {
+      "const": "tsp"
+    },
+    "message_type": {
+      "type": "string",
+      "enum": ["query", "response", "problem"]
+    },
+    "message_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "in_reply_to": {
+      "type": "string",
+      "minLength": 1
+    },
+    "body": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "message_type": {
+            "const": "query"
+          }
+        },
+        "required": ["message_type"]
+      },
+      "then": {
+        "not": {
+          "required": ["in_reply_to"]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "message_type": {
+            "enum": ["response", "problem"]
+          }
+        },
+        "required": ["message_type"]
+      },
+      "then": {
+        "required": ["in_reply_to"]
+      }
+    }
+  ]
+}
