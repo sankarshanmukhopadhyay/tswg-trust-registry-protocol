@@ -41,7 +41,7 @@ Completion of the v3 candidate **does not imply promotion to `main`**. Any futur
 
 The repository deliberately separates **the specification product** from **the evidence used to develop and assure it**.
 
-`specification/v3/` is what a reviewer or implementer should read. `development/` contains research, work-packet evidence, upstream dispositions, verification material and provenance. Development artifacts do not silently extend the normative specification.
+`specification/v3/` is what a reviewer or implementer should read. `development/` contains durable research, upstream dispositions, verification material and provenance. Development artifacts do not silently extend the normative specification and do not preserve temporary sequencing or planning artifacts.
 
 Approved v2 material remains under [`specification/v2-approved/`](specification/v2-approved/) as the stable baseline, migration reference and provenance record.
 
@@ -55,7 +55,7 @@ Agentic use is a mandatory stress lens, not an expansion of TRQP into an agent p
 
 ## Validation and assurance
 
-Executable downstream evidence remains under `tests/` and `development/verification-material/`. CI runs the downstream reference-model suite and RC-readiness controls. Local differential tests demonstrate repository-local consistency; they **do not** constitute independent organizational interoperability.
+Executable downstream evidence remains under `tests/` and `development/verification-material/`. CI runs the downstream reference-model suite and candidate-readiness controls. Local differential tests demonstrate repository-local consistency; they **do not** constitute independent organizational interoperability.
 
 ## Authority boundary
 
