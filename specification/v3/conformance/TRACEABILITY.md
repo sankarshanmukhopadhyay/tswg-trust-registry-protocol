@@ -8,6 +8,7 @@ The stable candidate requirement IDs are defined in [`REQUIREMENTS.md`](REQUIREM
 |---|---|---|---|
 | `TRQP3-PROP-*` | exact bounded proposition | baseline, principal/material and exact-scope tests; agentic exact-scope vectors | covered-local |
 | `TRQP3-MAT-*` | principal/material separation and exact material binding | material-bound evaluation and lifecycle tests | covered-local |
+| `TRQP3-ACT-*` | globally scoped action identifiers; OID URNs; EKU/TRQP non-inference; no silent aliasing | `tests/action-identifiers.test.js`; `development/verification-material/action-identifiers.js`; action-identifier EKU example | covered-local; external vocabulary governance remains authoritative |
 | `TRQP3-CTX-*` | decision-critical context | wire/schema compatibility and negotiation negative tests | covered-local |
 | `TRQP3-LIFE-*` | revocation, expiry, supersession, historical evaluation | lifecycle and historical-evaluation tests; agentic historical vectors | covered-local |
 | `TRQP3-EVID-*` | evidence authority/completeness/freshness/conflict | evidence-indeterminacy and conformance tests | covered-local |
@@ -26,6 +27,10 @@ The stable candidate requirement IDs are defined in [`REQUIREMENTS.md`](REQUIREM
 | `TRQP3-PRIV-*` | minimization cannot broaden proposition | critical-context/minimization negatives | covered-local |
 | `TRQP3-AUD-*` | reconstructable decision and agent replacement | agentic audit/replacement vectors; operational guidance | covered-local |
 | `TRQP3-COMP-*` | explicit migration, no inferred compatibility | v2/candidate negotiation and migration tests | covered-local |
+
+## Profile-scoped traceability rule
+
+A profile-specific requirement family is additional to core TRQP conformance and MUST remain traceable to a profile specification, executable evidence, and any external semantic authority on which the profile relies. Repository-local tests can prove that TRQP preserves the identifier boundary; they cannot redefine the meaning of an externally governed OID or URI.
 
 ## Binding-scoped traceability rule
 
