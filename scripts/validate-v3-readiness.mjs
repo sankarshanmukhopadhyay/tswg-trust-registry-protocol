@@ -21,8 +21,8 @@ const examples = read('specification/v3/examples/README.md');
 const implementers = read('specification/v3/guides/IMPLEMENTERS-GUIDE.md');
 const schemaRec = read('development/evidence/v3/SCHEMA-RECONCILIATION.md');
 const op = read('specification/v3/guides/OPERATIONAL-GUIDANCE.md');
-const requestSchema = JSON.parse(read('development/verification-material/schemas/wp7-request.schema.json'));
-const responseSchema = JSON.parse(read('development/verification-material/schemas/wp7-response.schema.json'));
+const requestSchema = JSON.parse(read('development/verification-material/schemas/request.schema.json'));
+const responseSchema = JSON.parse(read('development/verification-material/schemas/response.schema.json'));
 
 const ids = [...new Set(req.match(/TRQP3-[A-Z]+-[0-9]+/g) || [])];
 if (!ids.length) fail('no stable TRQP3 requirement IDs found');
@@ -47,8 +47,6 @@ if (!schemaRec.includes('semantic_field_loss_allowed: false')) fail('schema reco
 if (!trace.includes('SHOULD accounting rule')) fail('SHOULD accounting rule absent');
 if (!op.includes('Release-readiness checklist')) fail('operational release-readiness checklist absent');
 
-// Standards/editorial adoption controls: the public candidate must be understandable
-// as a specification, not only as a requirement ledger.
 for (const marker of [
   '## Abstract',
   '## Status of this document',
@@ -88,9 +86,6 @@ for (const exampleMarker of [
   if (!examples.includes(exampleMarker)) fail(`worked example corpus missing flow: ${exampleMarker}`);
 }
 
-// Scan the public candidate product plus the evidence artifact that constrains
-// schema reconciliation. Development evidence is supporting material, not an
-// alternate normative specification surface.
 const controlled = [
   'specification/v3/TRQP-V3.md',
   'specification/v3/conformance/REQUIREMENTS.md',
@@ -104,10 +99,11 @@ for (const p of controlled) {
   if (unresolved.test(text)) fail(`unresolved editorial marker in ${p}`);
 }
 
-// The retired work-packet path must never leak back into the public product surface.
+// Internal planning paths and execution vocabulary must not leak into the public candidate surface.
 for (const p of walkFiles('specification/v3').filter(p => /\.(md|ya?ml|json)$/i.test(p))) {
   const text = read(p);
   if (text.includes('development/next-draft/')) fail(`stale development/next-draft reference in public candidate artifact: ${p}`);
+  if (/\b(work[- ]packet|work[- ]tranche|restart checkpoint)\b/i.test(text)) fail(`internal execution vocabulary in public candidate artifact: ${p}`);
 }
 
 if (!process.exitCode) console.log(`RC readiness controls passed: ${ids.length} stable requirement IDs; schema/prose/traceability/adoption controls coherent.`);
