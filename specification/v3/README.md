@@ -7,6 +7,7 @@
 - **Normative protocol specification:** [`TRQP-V3.md`](TRQP-V3.md)
 - **Developer API & parameter reference:** [`API.md`](API.md)
 - **Machine-readable candidate HTTP contract:** [`openapi.yaml`](openapi.yaml)
+- **Optional semantic profiles:** [`profiles/`](profiles/)
 - **Experimental transport bindings:** [`bindings/`](bindings/)
 - **Implementation and migration guides:** [`guides/`](guides/)
 - **Conformance requirements and evidence map:** [`conformance/`](conformance/)
@@ -21,6 +22,7 @@ Everything required to understand or begin implementing the proposed v3 is reach
 |---|---|---|
 | [`TRQP-V3.md`](TRQP-V3.md) | Protocol semantics | **Normative downstream candidate** |
 | [`API.md`](API.md), [`openapi.yaml`](openapi.yaml), [`schemas/`](schemas/) | Candidate HTTP/wire realization | Normative only where explicitly bound to `TRQP-V3.md`; downstream binding conventions remain non-adopted |
+| [`profiles/`](profiles/) | Optional semantic profiles that strengthen identifier or processing semantics without changing the core wire shape | Profile-scoped downstream candidate semantics; not upstream-adopted |
 | [`bindings/`](bindings/) | Optional transport bindings that preserve TRQP semantics | Binding-scoped downstream experiments; not core TRQP semantics and not upstream-adopted |
 | [`conformance/`](conformance/) | Stable requirement IDs, coverage and interoperability expectations | Derived conformance controls |
 | [`guides/`](guides/) | Implementation, migration, agentic and operational explanation | Informative |
@@ -28,7 +30,7 @@ Everything required to understand or begin implementing the proposed v3 is reach
 | [`../../tests/`](../../tests/) and `../../development/verification-material/` | Executable verification | Assurance evidence |
 | [`../../development/evidence/v3/`](../../development/evidence/v3/) | Reconciliation, semantic dispositions and provenance | **Not specification** |
 
-If a development/evidence artifact appears to introduce normative protocol behavior absent from `TRQP-V3.md`, that is a specification defect to reconcile; it is not a hidden extension of v3.
+If a development/evidence artifact appears to introduce normative protocol behavior absent from `TRQP-V3.md` or an explicitly named optional profile, that is a specification defect to reconcile; it is not a hidden extension of v3.
 
 ## Status and branch governance
 
@@ -36,7 +38,7 @@ If a development/evidence artifact appears to introduce normative protocol behav
 
 The v3 designation, final upstream schema identifiers/member spelling, production binding selection and upstream adoption remain external authority decisions. The `/trqp/v3/query` path documented by the candidate OpenAPI contract is a downstream HTTP-binding convention, not an adopted upstream endpoint identifier.
 
-Optional bindings do not change the transport-neutral semantic core. A binding-specific conformance claim is additional to, and scoped separately from, core TRQP v3 conformance.
+Optional profiles and bindings do not weaken the transport-neutral semantic core. A profile- or binding-specific conformance claim is additional to, and scoped separately from, core TRQP v3 conformance.
 
 ## Implementation package
 
@@ -45,6 +47,7 @@ Optional bindings do not change the transport-neutral semantic core. A binding-s
 | Read normative v3 semantics | [`TRQP-V3.md`](TRQP-V3.md) |
 | API operations and parameters | [`API.md`](API.md) |
 | OpenAPI 3.1 contract | [`openapi.yaml`](openapi.yaml) |
+| Globally scoped action identifiers / EKU OID reuse | [`profiles/ACTION-IDENTIFIERS.md`](profiles/ACTION-IDENTIFIERS.md) |
 | Experimental TSP binding | [`bindings/tsp/`](bindings/tsp/) |
 | Candidate schema discovery | [`schemas/`](schemas/) |
 | Stable normative requirement IDs | [`conformance/REQUIREMENTS.md`](conformance/REQUIREMENTS.md) |
@@ -64,9 +67,11 @@ Approved v2 material remains under [`../v2-approved/`](../v2-approved/) as the s
 
 ## Reader paths
 
-**Review:** `TRQP-V3.md` → `API.md` → `conformance/`.
+**Review:** `TRQP-V3.md` → optional `profiles/` as applicable → `API.md` → `conformance/`.
 
-**Implement:** `API.md` / `openapi.yaml` → `guides/IMPLEMENTERS-GUIDE.md` → `examples/` → tests.
+**Implement:** `API.md` / `openapi.yaml` → applicable `profiles/` → `guides/IMPLEMENTERS-GUIDE.md` → `examples/` → tests.
+
+**Implement globally scoped action identifiers:** `TRQP-V3.md` → `profiles/ACTION-IDENTIFIERS.md` → `examples/action-identifier-eku.json` → `tests/action-identifiers.test.js`.
 
 **Implement over TSP:** `TRQP-V3.md` → `bindings/tsp/TRQP-TSP-BINDING.md` → binding schema/examples → `tests/tsp-binding.test.js`.
 
