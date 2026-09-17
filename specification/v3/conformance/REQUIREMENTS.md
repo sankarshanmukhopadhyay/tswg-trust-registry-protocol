@@ -11,6 +11,11 @@ This register assigns stable downstream identifiers to the candidate's release-s
 | TRQP3-MAT-001 | 3.2 | Principal and verification material are independently representable/governable. | principal/material independence vectors |
 | TRQP3-MAT-002 | 3.2 | Principal positive state does not imply material validity/applicability. | revoked/mismatched material vectors |
 | TRQP3-MAT-003 | 3.2 | Material-qualified evaluation binds exact principal/material/authority/action/resource and does not fall back. | mismatch negative vector |
+| TRQP3-ACT-001 | Action Identifier Profile §2/§7 | Treat the exact action identifier as proposition identity; changing it requires re-evaluation. | action-identifier exact-match and mismatch vectors |
+| TRQP3-ACT-002 | Action Identifier Profile §3/§7 | Use globally scoped identifiers for cross-domain interoperability; represent OID-valued actions in canonical `urn:oid:` form. | OID parsing/canonical-form tests |
+| TRQP3-ACT-003 | Action Identifier Profile §4/§7 | Reuse of an external identifier imports only the referenced action/purpose meaning, not unrelated protocol validation semantics. | external-vocabulary boundary tests and profile prose |
+| TRQP3-ACT-004 | Action Identifier Profile §5/§7 | EKU-in-action does not imply certificate EKU presence/validity or TRQP authorization; certificate EKU presence/validity does not imply TRQP authorization. | EKU non-inference negative vectors |
+| TRQP3-ACT-005 | Action Identifier Profile §2/§7 | Unknown/unsupported/differently serialized actions are not silently aliased, broadened or rewritten without explicit negotiated equivalence. | exact-identifier/no-alias tests |
 | TRQP3-CTX-001 | 3.3 | Supported critical members are evaluated under the processing contract; unsupported critical semantics resolve indeterminate/non-positive. | unsupported-critical-context vector |
 | TRQP3-LIFE-001 | 4 | Material lifecycle is evaluated independently from principal lifecycle. | revocation/expiry/supersession vectors |
 | TRQP3-LIFE-002 | 4 | Current state is not projected backwards for historical evaluation. | historical-before-revocation vector |
@@ -38,6 +43,12 @@ This register assigns stable downstream identifiers to the candidate's release-s
 | TRQP3-PRIV-001 | 17 | Privacy minimization never drops a critical condition to broaden evaluation. | minimization/downgrade vector |
 | TRQP3-AUD-001 | 18 | Audit evidence supports proposition/time/contract/evidence/result reconstruction and redress. | audit-survival/agent-replacement vector |
 | TRQP3-COMP-001 | 20 | Migration is explicit negotiation; syntactic legacy acceptance is not semantic compatibility. | v2/v3 differential corpus |
+
+## Profile-scoped conformance requirements
+
+Optional profiles MAY define additional requirement families that strengthen core processing without changing the core wire shape. Profile requirements MUST preserve exact proposition identity and MUST NOT silently redefine an existing core semantic.
+
+The Action Identifier Profile defines the `TRQP3-ACT-*` family in [`../profiles/ACTION-IDENTIFIERS.md`](../profiles/ACTION-IDENTIFIERS.md). Its executable evidence proves globally scoped action identifiers, OID URN handling, exact-match behavior, and the non-inference boundary between PKIX EKU purpose semantics and TRQP authorization.
 
 ## Binding-scoped conformance requirements
 
