@@ -2,18 +2,17 @@
 
 This directory is **not part of the normative TRQP v3 specification surface**.
 
-For the proposed downstream v3, start at [`../specification/v3/`](../specification/v3/). That package owns the public specification, API, guides, conformance controls and examples.
+For the proposed downstream v3, start at [`../specification/v3/`](../specification/v3/). That directory owns the public specification, API, guides, conformance controls and examples.
 
-`development/` retains material needed for engineering provenance and assurance, including work-packet evidence, upstream reconciliation/dispositions, experimental verification material and research/stress analysis. These artifacts explain **how the candidate was derived and tested**; they do not independently define what TRQP v3 means.
+`development/` retains durable engineering provenance and assurance evidence: upstream reconciliation and dispositions, experimental verification material, interoperability evidence, and research/stress analysis. These artifacts explain **why candidate claims are supportable and how they are tested**; they do not independently define TRQP v3 semantics.
 
 ## Authority rule
 
-If a file under `development/` appears to introduce a normative requirement that is absent from `specification/v3/TRQP-V3.md`, treat that as a defect and reconcile the normative specification. Do not treat development evidence as a hidden extension.
+If a file under `development/` appears to introduce a normative requirement that is absent from `specification/v3/TRQP-V3.md`, treat that as a defect and reconcile the normative specification. Development evidence is not a hidden extension.
 
 ## Current areas
 
-- `evidence/v3/` — completed v3 planning, reconciliation, stress-model and traceability provenance retained for audit.
-- `verification-material/` — executable models, schemas, fixtures and work-packet evidence used by downstream tests.
-- other development files — roadmap/assurance history predating or supporting the v3 candidate.
+- `evidence/v3/` — reconciliation, semantic dispositions, stress analysis and traceability provenance retained for audit.
+- `verification-material/` — executable models, schemas and interoperability evidence used by downstream tests.
 
-Work-packet labels such as WP0–WP7 are engineering provenance only. Public implementers should not need to understand them to implement the candidate.
+Evidence artifacts are named for the proposition or protocol behavior they establish. Temporary planning, sequencing, checkpoint, promotion and release-preparation material belongs in Issues/PRs rather than in the candidate branch.
