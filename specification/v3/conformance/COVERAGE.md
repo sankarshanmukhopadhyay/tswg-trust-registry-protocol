@@ -8,6 +8,7 @@ This matrix links stable candidate requirement families to executable evidence. 
 |---|---|---|---|
 | TRQP3-PROP-* | baseline/reference tests; material-bound evaluator | wrong principal/action/resource; false composition | covered |
 | TRQP3-MAT-* | material-bound evaluation tests | identity/authority separation | covered |
+| TRQP3-ACT-* | action-identifier helper + `tests/action-identifiers.test.js` | exact action purpose remains independent of material validity/identity | covered-local |
 | TRQP3-CTX-* | critical-context/conformance tests | unsupported delegation context | covered |
 | TRQP3-LIFE-* | lifecycle/historical tests | expiry, revocation, historical-before-revocation | covered |
 | TRQP3-EVID-* | evidence/conformance tests | capability-only, stale/revoked evidence boundaries | covered |
@@ -26,6 +27,10 @@ This matrix links stable candidate requirement families to executable evidence. 
 | TRQP3-PRIV-* | critical-context invariants | minimization cannot drop authority context | semantic coverage; dedicated privacy vector desirable |
 | TRQP3-AUD-* | audit/provenance tests | runtime replacement preserves prior binding | covered-local |
 | TRQP3-COMP-* | migration/differential tests | no implicit legacy semantics | covered |
+
+## Action identifier coverage boundary
+
+The `TRQP3-ACT-*` suite establishes repository-local semantics for exact action matching, canonical OID URN handling, and the rule that PKIX EKU purpose identifiers do not manufacture TRQP authorization. The suite does not redefine or independently validate the external PKIX vocabulary. External identifier ownership and meaning remain with the governing standard or profile.
 
 ## Publication-readiness interpretation
 
