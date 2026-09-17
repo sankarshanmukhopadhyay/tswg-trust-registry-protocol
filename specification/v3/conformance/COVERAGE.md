@@ -17,6 +17,7 @@ This matrix links stable candidate requirement families to executable evidence. 
 | TRQP3-RESP-* | conformance vectors | audit binding | covered |
 | TRQP3-NEG-* | negotiation/migration tests | no authority by weaker semantics | covered |
 | TRQP3-BIND-* | binding/transport tests | endpoint identity separation | covered-local |
+| TRQP3-TSP-* | TSP binding reference module + `tests/tsp-binding.test.js` | authenticated endpoint != semantic authority/authorization | covered-local; independent TSP/TRQP interop pending |
 | TRQP3-DISC-* | S21-05 discovery + differential tests | capability != authorization | covered-local; external interop pending |
 | TRQP3-PROF-* | profile/negotiation tests | component/profile composition | covered-local |
 | TRQP3-REC-* | recognition tests | recognized delegator != delegate; non-transitivity | covered-local |
@@ -29,6 +30,8 @@ This matrix links stable candidate requirement families to executable evidence. 
 ## Publication-readiness interpretation
 
 The current suite establishes broad downstream behavioural coverage. Publication readiness additionally requires automated assertion that every registered MUST is mapped, schema/example validation, documentation completion, and bounded external-interoperability disposition for critical discovery/recognition/binding behaviour.
+
+Optional binding coverage is scoped to the binding-specific conformance target. A green repository-local TSP binding suite demonstrates internal semantic preservation; it does not establish interoperability with an independently implemented TSP stack.
 
 ## Agentic gate
 
