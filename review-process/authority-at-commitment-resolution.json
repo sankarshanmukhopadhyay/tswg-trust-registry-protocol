@@ -1,0 +1,51 @@
+{
+  "assessment_id": "TRQP-AAC-001",
+  "version": "1.0",
+  "status": "informative-downstream",
+  "authority_transfer": false,
+  "core_change_recommended": false,
+  "capabilities": [
+    {
+      "requirement": "authorization-registry-fact-resolution",
+      "disposition": "supported-as-input"
+    },
+    {
+      "requirement": "recognition-resolution",
+      "disposition": "supported-not-authority"
+    },
+    {
+      "requirement": "identity-or-signature-proof",
+      "disposition": "out-of-scope"
+    },
+    {
+      "requirement": "delegation-mandate-chain-resolution",
+      "disposition": "requires-extension-or-external-resolver"
+    },
+    {
+      "requirement": "exact-action-constraint-evaluation",
+      "disposition": "out-of-scope-policy"
+    },
+    {
+      "requirement": "exact-action-approval-binding",
+      "disposition": "out-of-scope-approval"
+    },
+    {
+      "requirement": "commitment-time-status-freshness",
+      "disposition": "evidence-dependent"
+    },
+    {
+      "requirement": "historical-as-of-authority",
+      "disposition": "requires-explicit-capability"
+    },
+    {
+      "requirement": "binding-effect-decision",
+      "disposition": "out-of-scope"
+    }
+  ],
+  "invariants": [
+    "source-registry-remains-authoritative",
+    "recognition-is-not-authorization",
+    "current-state-is-not-historical-state",
+    "missing-capability-is-not-pass"
+  ]
+}
