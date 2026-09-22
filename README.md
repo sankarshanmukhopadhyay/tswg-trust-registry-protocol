@@ -57,3 +57,7 @@ The TRQP v2.0 specification is focused solely on Recognition and Authorization q
 - **Description (Metadata) Queries**: “What DID methods does Ecosystem A support?”
 
 A further area about establishing a "query language" emerged from the efforts in the Trust Registry Task Force, which has taken on the [Trust Registry Query Language](https://lf-toip.atlassian.net/wiki/spaces/HOME/pages/149749777/TRQL+Trust+Registry+Query+Language) as a separate specification to consider.
+
+## Downstream authority-at-commitment assessment
+
+An informative downstream assessment of how current TRQP query semantics can contribute to, but do not themselves establish, action-specific commitment authority is available at [review-process/authority-at-commitment-resolution.md](review-process/authority-at-commitment-resolution.md). It does not amend the upstream specification.
