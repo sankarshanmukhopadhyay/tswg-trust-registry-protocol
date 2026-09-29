@@ -1,0 +1,17 @@
+{
+  "decision": "positive",
+  "reason": "established",
+  "authorized": true,
+  "evaluation_time": "2026-09-29T04:00:00Z",
+  "evidence_state": "sufficient",
+  "grounding": [
+    {
+      "source_id": "urn:example:authority-statement:123",
+      "source_authority": "did:example:authority",
+      "source_version": "7",
+      "digest": "sha256:0123456789abcdef",
+      "effective_from": "2026-08-01T00:00:00Z",
+      "evidence_ref": "urn:example:evidence:statement-123-v7"
+    }
+  ]
+}
