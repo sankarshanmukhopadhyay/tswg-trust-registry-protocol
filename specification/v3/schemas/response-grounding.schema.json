@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/trqp/v3/grounding.schema.json",
+  "title": "TRQP Candidate v3 optional response grounding",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["source_id", "source_authority"],
+    "properties": {
+      "source_id": { "type": "string", "minLength": 1 },
+      "source_authority": { "type": "string", "minLength": 1 },
+      "source_version": { "type": "string", "minLength": 1 },
+      "digest": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*:.+$"
+      },
+      "effective_from": { "type": "string", "format": "date-time" },
+      "effective_until": { "type": "string", "format": "date-time" },
+      "evidence_ref": { "type": "string", "minLength": 1 }
+    }
+  }
+}

@@ -161,6 +161,18 @@ Candidate evidence-state vocabulary is: `sufficient`, `incomplete`, `stale`, `un
 
 Evidence sufficiency is a property of the evidence set relative to the exact proposition. A source can be authoritative for one scope and non-authoritative for another; complete for current state and incomplete for historical state; or fresh enough for one relying decision and too stale for another. Deployments therefore SHOULD make authority, completeness, freshness, and temporal coverage explicit governance inputs rather than hidden implementation assumptions.
 
+### 5.2 Optional response grounding
+
+A processor **MAY** include `grounding` metadata identifying the bounded authoritative basis used to produce a semantic determination. Grounding is provenance metadata: it **MUST NOT** override, reinterpret, or create a second semantic decision, and a referenced source does not become authoritative merely because the processor returns it. [`TRQP3-GROUND-001`, `TRQP3-GROUND-003`]
+
+Each grounding entry **MUST** identify both the referenced source (`source_id`) and the authority responsible for that source state (`source_authority`). It **MAY** additionally identify a source version, algorithm-qualified digest, effective interval, or indirect evidence reference. [`TRQP3-GROUND-002`, `TRQP3-GROUND-005`]
+
+For historical evaluation, an effective interval supplied as grounding **MUST** be applicable to the requested evaluation time. Current or later state **MUST NOT** be presented as the grounding of an earlier determination unless that source validly establishes the earlier effective state. [`TRQP3-GROUND-004`]
+
+Grounding is optional in the core Candidate v3 contract. A profile **MAY** require stronger grounding or assurance packaging. Core Candidate v3 does not require raw evidence disclosure, signatures, notarisation, trusted timestamps, or any particular database, event-log, credential, or persistence architecture. [`TRQP3-GROUND-006`]
+
+A responder **MUST NOT** expose evidence or provenance information that the requester is not authorized to receive merely to populate grounding metadata. Implementations SHOULD prefer stable, bounded references or digests over internal persistence identifiers.
+
 ### 5.2 Absence
 
 Absence **MAY** support an authoritative negative only when the evidence source is authoritative and complete for the evaluated scope and temporally sufficient for the requested evaluation. Record absence from an incomplete, stale, unavailable or non-authoritative source **MUST** yield `indeterminate`. [`TRQP3-EVID-003`]
