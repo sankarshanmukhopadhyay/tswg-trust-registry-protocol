@@ -24,7 +24,7 @@ Independent implementations should converge on: exact proposition binding; mater
 
 ## External S21-05 packet
 
-An external participant can implement the wire-shaped `trqp-capability-v1` semantic contract without importing repository code, then run the shared fresh/stale/unauthorized/version/profile/endpoint-movement/conflict/replay vectors. Record observable outcome only; implementation internals need not match.
+An external participant can implement the wire-shaped `trqp-capability-v1` semantic contract without importing repository code, then run the shared fresh/stale/unauthorized/version/profile/mandatory-semantics/critical-context/endpoint-movement/conflict/replay vectors. The participant should demonstrate that a validated capability declaration can feed candidate negotiation without hidden defaults or semantic widening, and that incomplete candidate capability metadata fails before evaluation. Record observable outcome only; implementation internals need not match.
 
 ## Promotion evidence
 

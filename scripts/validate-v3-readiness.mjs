@@ -24,6 +24,9 @@ const schemaRec = read('development/evidence/v3/SCHEMA-RECONCILIATION.md');
 const op = read('specification/v3/guides/OPERATIONAL-GUIDANCE.md');
 const requestSchema = JSON.parse(read('development/verification-material/schemas/request.schema.json'));
 const responseSchema = JSON.parse(read('development/verification-material/schemas/response.schema.json'));
+const capabilitySchema = JSON.parse(read('development/verification-material/schemas/capability.schema.json'));
+const discoveryNegotiation = read('development/verification-material/discovery-negotiation.js');
+const discoveryNegotiationTests = read('tests/s21-05-discovery-negotiation.test.js');
 
 const ids = [...new Set(req.match(/TRQP3-[A-Z]+-[0-9]+/g) || [])];
 if (!ids.length) fail('no stable TRQP3 requirement IDs found');
@@ -36,6 +39,23 @@ for (const family of ['PROP','MAT','CTX','LIFE','EVID','DEC','REQ','EVAL','RESP'
 for (const token of ['critical_context','required_profiles','verification_material']) {
   if (!JSON.stringify(requestSchema).includes(token)) fail(`request schema missing ${token}`);
   if (!examples.includes(token)) fail(`examples missing ${token}`);
+}
+for (const token of ['service_id','publisher_id','trqp_versions','processing_profiles','processing_semantics','supported_context','issued_at','expires_at','endpoints']) {
+  if (!JSON.stringify(capabilitySchema).includes(token)) fail(`capability schema missing ${token}`);
+}
+for (const required of ['processing_semantics','supported_context']) {
+  if (!JSON.stringify(capabilitySchema.allOf || []).includes(required)) fail(`candidate capability conditional does not require ${required}`);
+}
+for (const marker of ['normalizeDiscoveredCapability','negotiateDiscoveredCapability','validateAndNegotiateCapability']) {
+  if (!discoveryNegotiation.includes(marker)) fail(`discovery→negotiation adapter missing ${marker}`);
+}
+for (const marker of [
+  'candidate advertisement without mandatory processing semantics fails before negotiation',
+  'complete capability lacking required critical-context support fails closed',
+  'v2-only discovery cannot trigger fallback for a candidate request',
+  'independently structured implementation converges on end-to-end negotiation outcomes'
+]) {
+  if (!discoveryNegotiationTests.includes(marker)) fail(`discovery→negotiation assurance missing test: ${marker}`);
 }
 for (const token of ['decision','reason','evidence_state','time_evaluated','evidence']) {
   if (!JSON.stringify(responseSchema).includes(token)) fail(`response schema missing ${token}`);
@@ -82,7 +102,8 @@ for (const exampleMarker of [
   'Evidence unavailable',
   'Material-qualified historical request',
   'Agent acting for a principal',
-  'Failed candidate negotiation'
+  'Failed candidate negotiation',
+  'Discovery-driven candidate negotiation'
 ]) {
   if (!examples.includes(exampleMarker)) fail(`worked example corpus missing flow: ${exampleMarker}`);
 }

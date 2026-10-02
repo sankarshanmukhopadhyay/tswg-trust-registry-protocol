@@ -1,0 +1,28 @@
+{
+  "type": "trqp-capability-v1",
+  "service_id": "urn:trqp:registry:alpha",
+  "publisher_id": "did:example:registry-alpha-operator",
+  "trqp_versions": [
+    "2.0",
+    "3.0-candidate"
+  ],
+  "processing_profiles": [
+    "candidate-material-binding"
+  ],
+  "processing_semantics": [
+    "critical-context-fail-closed",
+    "material-bound-evaluation",
+    "decision-reason-classes"
+  ],
+  "supported_context": [
+    "verification_material",
+    "time"
+  ],
+  "issued_at": "2026-09-13T00:00:00Z",
+  "expires_at": "2026-09-15T00:00:00Z",
+  "endpoints": [
+    {
+      "uri": "https://registry-a.example/trqp"
+    }
+  ]
+}

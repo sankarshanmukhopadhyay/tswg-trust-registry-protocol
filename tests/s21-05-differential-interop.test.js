@@ -8,6 +8,8 @@ function doc(overrides = {}) {
   return {
     type: 'trqp-capability-v1', service_id: 'urn:trqp:registry:alpha', publisher_id: 'did:example:operator',
     trqp_versions: ['3.0-candidate'], processing_profiles: ['candidate-material-binding'],
+    processing_semantics: ['critical-context-fail-closed', 'material-bound-evaluation', 'decision-reason-classes'],
+    supported_context: ['verification_material', 'time'],
     issued_at: '2026-09-13T00:00:00Z', expires_at: '2026-09-15T00:00:00Z',
     endpoints: [{ uri: 'https://one.example/trqp' }], ...overrides
   };
@@ -38,4 +40,10 @@ test('independent implementations preserve semantic identity across endpoint mov
   const b = independent.inspectCapability(doc({ endpoints: [{ uri: 'https://moved.example/trqp' }] }), policy);
   assert.equal(a.service_id, b.service_id);
   assert.notEqual(a.endpoints[0].uri, b.endpoints[0].uri);
+});
+
+
+test('independent implementations converge on incomplete candidate capability rejection', () => {
+  converges(doc({ processing_semantics: undefined }));
+  converges(doc({ supported_context: undefined }));
 });

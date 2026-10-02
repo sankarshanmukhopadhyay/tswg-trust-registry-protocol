@@ -220,6 +220,29 @@ no semantic candidate decision
 
 If the relying application has an independent policy permitting a separate v2 query, that query is a separate proposition and must not be represented as equivalent to the failed candidate request.
 
+## 7.1 Discovery-driven candidate negotiation
+
+A requester retrieves and validates [`capability-discovery.json`](capability-discovery.json). The declaration advertises candidate-v3, the required profile, the mandatory processing semantics, and support for the request's decision-critical context.
+
+For a request requiring `candidate-material-binding` with critical `verification_material` and `time`, the validated declaration can be normalized directly into the negotiation peer contract:
+
+```text
+validated discovery
+  processing_profiles
+  processing_semantics
+  supported_context
+        ↓
+explicit normalization
+        ↓
+candidate negotiation
+        ↓
+admitted
+```
+
+If the declaration advertises `3.0-candidate` but omits `processing_semantics` or `supported_context`, candidate admission fails before semantic evaluation. If the declaration is stale, unauthorized, conflicting, or does not support the required profile/context, the request likewise fails closed. None of these failures authorizes a generic-v2 retry of the same proposition.
+
+Successful discovery and negotiation establish processing compatibility only. The service endpoint, capability publisher, and successful negotiation are not evidence that the queried entity is authorized or recognized.
+
 ## 8. Recognition is direct, not transitive
 
 Evidence:

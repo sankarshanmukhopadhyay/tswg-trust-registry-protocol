@@ -1,9 +1,13 @@
 'use strict';
 
 const CAPABILITY_DOCUMENT_TYPE = 'trqp-capability-v1';
+const CANDIDATE_VERSION = '3.0-candidate';
 
-function uniqueStrings(value) {
-  return Array.isArray(value) && value.length > 0 && value.every(v => typeof v === 'string' && v.length > 0) && new Set(value).size === value.length;
+function uniqueStrings(value, { allowEmpty = false } = {}) {
+  return Array.isArray(value)
+    && (allowEmpty || value.length > 0)
+    && value.every(v => typeof v === 'string' && v.length > 0)
+    && new Set(value).size === value.length;
 }
 
 function parseTime(value) {
@@ -21,6 +25,15 @@ function validateCapabilityDocument(document, options = {}) {
   if (!uniqueStrings(document.trqp_versions) || !uniqueStrings(document.processing_profiles)) return { valid: false, reason: 'malformed-capability-document' };
   if (!Array.isArray(document.endpoints) || document.endpoints.length === 0 || document.endpoints.some(e => !e || typeof e.uri !== 'string' || !e.uri)) return { valid: false, reason: 'malformed-capability-document' };
 
+  const candidateAdvertised = document.trqp_versions.includes(CANDIDATE_VERSION);
+  if (candidateAdvertised) {
+    if (!uniqueStrings(document.processing_semantics)) return { valid: false, reason: 'incomplete-candidate-capability' };
+    if (!uniqueStrings(document.supported_context, { allowEmpty: true })) return { valid: false, reason: 'incomplete-candidate-capability' };
+  } else {
+    if (document.processing_semantics !== undefined && !uniqueStrings(document.processing_semantics, { allowEmpty: true })) return { valid: false, reason: 'malformed-capability-document' };
+    if (document.supported_context !== undefined && !uniqueStrings(document.supported_context, { allowEmpty: true })) return { valid: false, reason: 'malformed-capability-document' };
+  }
+
   const issued = parseTime(document.issued_at);
   const expires = parseTime(document.expires_at);
   if (!Number.isFinite(issued) || !Number.isFinite(expires) || issued >= expires) return { valid: false, reason: 'malformed-capability-document' };
@@ -33,6 +46,8 @@ function validateCapabilityDocument(document, options = {}) {
     publisher_id: document.publisher_id,
     trqp_versions: [...document.trqp_versions],
     processing_profiles: [...document.processing_profiles],
+    processing_semantics: [...(document.processing_semantics || [])],
+    supported_context: [...(document.supported_context || [])],
     endpoints: document.endpoints.map(e => ({ ...e }))
   };
 }
@@ -48,7 +63,9 @@ function reconcileCapabilityDocuments(documents, options = {}) {
 
   const fingerprints = new Set(usable.map(item => JSON.stringify({
     versions: [...item.result.trqp_versions].sort(),
-    profiles: [...item.result.processing_profiles].sort()
+    profiles: [...item.result.processing_profiles].sort(),
+    semantics: [...item.result.processing_semantics].sort(),
+    context: [...item.result.supported_context].sort()
   })));
   if (fingerprints.size > 1) return { resolved: false, reason: 'conflicting-capability-metadata' };
 
@@ -73,4 +90,10 @@ function admitDiscoveredCapability(request, capabilityResult) {
   };
 }
 
-module.exports = { CAPABILITY_DOCUMENT_TYPE, validateCapabilityDocument, reconcileCapabilityDocuments, admitDiscoveredCapability };
+module.exports = {
+  CAPABILITY_DOCUMENT_TYPE,
+  CANDIDATE_VERSION,
+  validateCapabilityDocument,
+  reconcileCapabilityDocuments,
+  admitDiscoveredCapability
+};

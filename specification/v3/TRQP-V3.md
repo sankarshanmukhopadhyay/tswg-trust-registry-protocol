@@ -302,6 +302,12 @@ The downstream candidate defines a transport-independent capability contract and
 
 Discovery data is security-sensitive configuration. Implementations SHOULD validate publisher authority, freshness, service identity, supported processing semantics, and conflict state before using capability metadata to admit a candidate request.
 
+For candidate-v3 admission, a validated capability declaration **MUST** bind the complete negotiation-facing contract: supported TRQP versions, processing profiles, mandatory processing semantics, and supported decision-critical context. Advertising the candidate version or a profile label while omitting those processing dimensions is an incomplete capability declaration and **MUST** fail closed before semantic evaluation. [`TRQP3-DISC-003`]
+
+The discovery-to-negotiation adaptation **MUST** be explicit and semantics-preserving. In particular, `processing_profiles` discovered for a service may populate the negotiation profile set, but the adapter MUST carry mandatory `processing_semantics` and `supported_context` without inventing defaults or consulting hidden configuration. A capability declaration that is stale, unauthorized, conflicting, incomplete, or unable to satisfy the requested processing contract MUST NOT be repaired by deleting request conditions or routing the candidate request to generic v2 processing.
+
+Endpoint URI and publisher identity remain routing/provenance facts. Successful validation and negotiation establish only that the endpoint can process the declared candidate contract; they do not establish authorization, recognition, or governance authority for the queried proposition.
+
 ## 13. Governance and security profiles
 
 A profile **MAY** strengthen evidence, governance, security, cryptographic or operational requirements. A profile **MUST NOT** silently redefine proposition identity or weaken mandatory core processing semantics. [`TRQP3-PROF-001`]

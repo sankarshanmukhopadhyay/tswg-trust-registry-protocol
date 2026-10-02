@@ -16,6 +16,8 @@ function document(overrides = {}) {
     publisher_id: 'did:example:registry-alpha-operator',
     trqp_versions: ['2.0', '3.0-candidate'],
     processing_profiles: ['candidate-material-binding'],
+    processing_semantics: ['critical-context-fail-closed', 'material-bound-evaluation', 'decision-reason-classes'],
+    supported_context: ['verification_material', 'time'],
     issued_at: '2026-09-13T00:00:00Z',
     expires_at: '2026-09-15T00:00:00Z',
     endpoints: [{ uri: 'https://registry-a.example/trqp' }],
@@ -45,11 +47,14 @@ test('unauthorized publisher cannot assert capabilities', () => {
 });
 
 test('conflicting capability documents are not silently selected', () => {
-  const result = reconcileCapabilityDocuments([
-    document(),
-    document({ processing_profiles: ['candidate-material-binding', 'high-assurance'] })
-  ], options);
-  assert.deepEqual(result, { resolved: false, reason: 'conflicting-capability-metadata' });
+  for (const conflicting of [
+    document({ processing_profiles: ['candidate-material-binding', 'high-assurance'] }),
+    document({ processing_semantics: ['critical-context-fail-closed'] }),
+    document({ supported_context: ['time'] })
+  ]) {
+    const result = reconcileCapabilityDocuments([document(), conflicting], options);
+    assert.deepEqual(result, { resolved: false, reason: 'conflicting-capability-metadata' });
+  }
 });
 
 test('version downgrade is rejected rather than silently routed to v2', () => {
@@ -93,4 +98,15 @@ test('capability advertisement without required implementation profile is not ad
   const result = admitDiscoveredCapability({ trqp_version: '3.0-candidate', required_profiles: ['candidate-material-binding'] }, capability);
   assert.equal(result.admitted, false);
   assert.equal(result.reason, 'profile-downgrade-rejected');
+});
+
+
+test('candidate capability declaration must expose negotiation semantics and context support', () => {
+  for (const overrides of [
+    { processing_semantics: undefined },
+    { supported_context: undefined }
+  ]) {
+    const result = validateCapabilityDocument(document(overrides), options);
+    assert.deepEqual(result, { valid: false, reason: 'incomplete-candidate-capability' });
+  }
 });

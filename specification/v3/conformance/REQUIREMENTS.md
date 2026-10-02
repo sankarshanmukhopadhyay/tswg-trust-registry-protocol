@@ -33,6 +33,7 @@ This register assigns stable downstream identifiers to the candidate's release-s
 | TRQP3-BIND-001 | 11 | Binding does not create semantic meaning, drop critical context, rewrite time/scope, or confuse endpoint identity with semantic identity. | binding-invariant vectors |
 | TRQP3-DISC-001 | 12 | Discovery is distinct from authorization, recognition and registry membership. | discovery-not-authority vector |
 | TRQP3-DISC-002 | 12 | Invalid/stale/unavailable capability metadata does not trigger legacy downgrade. | discovery downgrade vector |
+| TRQP3-DISC-003 | 12 | A capability declaration used for candidate admission binds the version, profiles, mandatory processing semantics and supported critical context consumed by negotiation; incomplete declarations fail closed. | discovery→negotiation integration and differential vectors |
 | TRQP3-PROF-001 | 13 | Profiles may strengthen but do not weaken/redefine mandatory core semantics or proposition identity. | profile weakening negative vectors |
 | TRQP3-PROF-002 | 13 | Conflicting mandatory profile obligations fail closed before evaluation. | profile-conflict vector |
 | TRQP3-REC-001 | 14 | Recognition is distinct from authorization, material validity and discovery. | recognition separation vectors |

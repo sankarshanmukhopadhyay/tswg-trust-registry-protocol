@@ -19,7 +19,7 @@ The stable candidate requirement IDs are defined in [`REQUIREMENTS.md`](REQUIREM
 | `TRQP3-NEG-*` | candidate negotiation and no silent v2 fallback | negotiation/migration tests | covered-local |
 | `TRQP3-BIND-*` | transport binding invariants | S21-09 transport/profile boundary tests | covered-local |
 | `TRQP3-TSP-*` | optional TSP binding: VID/semantic separation, correlation, fail-closed context, transport-failure separation | `tests/tsp-binding.test.js`; `development/verification-material/tsp-binding.js`; binding schema/examples | covered-local; independent TSP/TRQP interop external |
-| `TRQP3-DISC-*` | discovery distinct from authority; downgrade resistance | S21-05 capability, well-known and differential tests | covered-local; independent interop external |
+| `TRQP3-DISC-*` | discovery distinct from authority; downgrade resistance; complete discovery→negotiation contract | S21-05 capability, well-known, discovery-negotiation and differential tests; `development/verification-material/discovery-negotiation.js` | covered-local; independent interop external |
 | `TRQP3-PROF-*` | profiles strengthen core; conflicts fail closed | S21-09 profile composition and negotiation tests | covered-local |
 | `TRQP3-REC-*` | recognition separation and non-transitivity | recognition/conformance tests; agentic non-transitivity vector | covered-local; positive propagation intentionally absent |
 | `TRQP3-ERR-*` | processing/transport errors distinct from semantic negative | S21-09 transport tests; RFC 9457 boundary | covered-local |

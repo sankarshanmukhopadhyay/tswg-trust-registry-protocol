@@ -111,7 +111,30 @@ Before candidate evaluation, peers must establish support for the candidate proc
 
 ## 7. Discovery and capabilities
 
-Discovery answers **where and how to contact a capable endpoint**; it does not establish authorization, recognition or registry membership. A candidate capability document should identify service/registry identity, endpoint locations, supported versions/profiles/critical context, mandatory processing semantics and enough authority/freshness information to validate the assertion. The repository includes experimental discovery evidence; core candidate semantics do not require one production discovery transport.
+Discovery answers **where and how to contact a capable endpoint**; it does not establish authorization, recognition or registry membership. A candidate capability document should identify service/registry identity, endpoint locations, supported versions/profiles/critical context, mandatory processing semantics and enough authority/freshness information to validate the assertion.
+
+For `3.0-candidate`, the transport-independent capability document is expected to carry these negotiation-facing fields:
+
+```json
+{
+  "type": "trqp-capability-v1",
+  "service_id": "urn:trqp:registry:alpha",
+  "publisher_id": "did:example:operator",
+  "trqp_versions": ["3.0-candidate"],
+  "processing_profiles": ["candidate-material-binding"],
+  "processing_semantics": [
+    "critical-context-fail-closed",
+    "material-bound-evaluation",
+    "decision-reason-classes"
+  ],
+  "supported_context": ["verification_material", "time"],
+  "issued_at": "2026-09-13T00:00:00Z",
+  "expires_at": "2026-09-15T00:00:00Z",
+  "endpoints": [{"uri": "https://registry.example/trqp"}]
+}
+```
+
+A candidate-version declaration without `processing_semantics` or `supported_context` is incomplete for negotiation and must not be supplemented from undocumented local defaults. The validated declaration is normalized directly into the negotiation peer contract: `processing_profiles` → candidate profiles, with `processing_semantics` and `supported_context` preserved. The repository includes experimental discovery evidence; core candidate semantics do not require one production discovery transport.
 
 ## 8. Agentic parameter interpretation
 
