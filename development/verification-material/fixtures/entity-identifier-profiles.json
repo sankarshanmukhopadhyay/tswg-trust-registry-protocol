@@ -1,0 +1,59 @@
+{
+  "status": "downstream-experimental",
+  "profiles": [
+    {
+      "profile_id": "public-uri-exact-v1",
+      "identifier_class": "public-uri",
+      "scope_kind": "global",
+      "comparison_mode": "exact",
+      "resolution_mode": "optional",
+      "binding_method": "registry",
+      "public_correlation": true
+    },
+    {
+      "profile_id": "authority-local-explicit-v1",
+      "identifier_class": "authority-local",
+      "scope_kind": "authority",
+      "comparison_mode": "explicit-equivalence",
+      "resolution_mode": "not-used",
+      "binding_method": "explicit-mapping",
+      "public_correlation": false
+    }
+  ],
+  "vectors": [
+    {
+      "name": "global-public-uri",
+      "identifier": "did:example:alice",
+      "scope": {
+        "kind": "global"
+      },
+      "expected": "positive"
+    },
+    {
+      "name": "authority-local-opaque",
+      "identifier": "A-1842",
+      "scope": {
+        "kind": "authority",
+        "id": "did:example:authority-r"
+      },
+      "expected": "positive"
+    },
+    {
+      "name": "lexical-difference-without-equivalence",
+      "identifier": "did:example:ALICE",
+      "scope": {
+        "kind": "global"
+      },
+      "expected": "not-positive"
+    },
+    {
+      "name": "wrong-authority-scope",
+      "identifier": "A-1842",
+      "scope": {
+        "kind": "authority",
+        "id": "did:example:authority-other"
+      },
+      "expected": "not-positive"
+    }
+  ]
+}
