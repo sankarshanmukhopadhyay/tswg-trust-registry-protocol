@@ -19,7 +19,7 @@ This matrix links stable candidate requirement families to executable evidence. 
 | TRQP3-NEG-* | negotiation/migration tests | no authority by weaker semantics | covered |
 | TRQP3-BIND-* | binding/transport tests | endpoint identity separation | covered-local |
 | TRQP3-TSP-* | TSP binding reference module + `tests/tsp-binding.test.js` | authenticated endpoint != semantic authority/authorization | covered-local; independent TSP/TRQP interop pending |
-| TRQP3-DISC-* | S21-05 discovery + differential tests | capability != authorization | covered-local; external interop pending |
+| TRQP3-DISC-* | S21-05 discovery + discovery→negotiation + differential tests | capability != authorization; incomplete capability contract cannot admit v3 | covered-local; external interop pending |
 | TRQP3-PROF-* | profile/negotiation tests | component/profile composition | covered-local |
 | TRQP3-REC-* | recognition tests | recognized delegator != delegate; non-transitivity | covered-local |
 | TRQP3-ERR-* | conformance/error tests | processing failure != semantic negative | covered |
