@@ -179,10 +179,27 @@ Before using it to admit candidate processing, validate where applicable:
 - freshness;
 - supported protocol version;
 - required profiles;
+- mandatory processing semantics;
 - supported critical-context semantics; and
 - conflicts with other capability documents.
 
-Endpoint movement must not rewrite semantic authority identity. Capability advertisement must not be promoted into authorization.
+For candidate-v3 discovery, treat the validated capability document as the sole input to an explicit normalization step before negotiation. The normalization should map discovered `processing_profiles` into the peer profile set while carrying `processing_semantics` and `supported_context` unchanged. Do not fill absent semantics from local defaults or hidden configuration: a service that advertises candidate-v3 but omits mandatory processing semantics or its supported critical-context set is not sufficiently described for candidate admission.
+
+A useful pipeline is:
+
+```text
+retrieve capability declaration
+      ↓
+validate publisher + freshness + conflict state
+      ↓
+normalize discovery fields into negotiation input
+      ↓
+negotiate version + profiles + mandatory semantics + critical context
+      ↓
+candidate processing OR fail closed
+```
+
+Endpoint movement must not rewrite semantic authority identity. Capability advertisement and successful negotiation establish processing compatibility only; neither may be promoted into authorization, recognition, or registry authority.
 
 ## 12. Recognition
 
