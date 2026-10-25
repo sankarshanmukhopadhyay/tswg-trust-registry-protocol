@@ -10,6 +10,7 @@ The stable candidate requirement IDs are defined in [`REQUIREMENTS.md`](REQUIREM
 | `TRQP3-MAT-*` | principal/material separation and exact material binding | material-bound evaluation and lifecycle tests | covered-local |
 | `TRQP3-ACT-*` | globally scoped action identifiers; OID URNs; EKU/TRQP non-inference; no silent aliasing | `tests/action-identifiers.test.js`; `development/verification-material/action-identifiers.js`; action-identifier EKU example | covered-local; external vocabulary governance remains authoritative |
 | `TRQP3-CTX-*` | decision-critical context | wire/schema compatibility and negotiation negative tests | covered-local |
+| `TRQP3-TIME-*` | bitemporal effective/recording time, evidence cutoff and retroactive corrections | `tests/historical-evaluation.test.js`; `development/verification-material/history.js`; request/response schema temporal fields | covered-local; independently archived record completeness external |
 | `TRQP3-LIFE-*` | revocation, expiry, supersession, historical evaluation | lifecycle and historical-evaluation tests; agentic historical vectors | covered-local |
 | `TRQP3-EVID-*` | evidence authority/completeness/freshness/conflict | evidence-indeterminacy and conformance tests | covered-local |
 | `TRQP3-DEC-*` | positive/negative/indeterminate/not-applicable | conformance vectors and evidence tests | covered-local |
