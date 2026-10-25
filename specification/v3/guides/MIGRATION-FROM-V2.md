@@ -42,3 +42,6 @@ Autonomous participation does not change the migration rule. Agent identity, cap
 ## Compatibility claim
 
 A product should claim only the processing level it has demonstrated. `v2 compatible`, `candidate-v3 parser`, and `candidate-v3 conformant` are materially different claims. Parsing candidate fields without enforcing their mandatory semantics is not candidate-v3 conformance.
+## Bitemporal history
+
+The optional `bitemporal-history` profile requires both `effective_at` and `evidence_as_of` as decision-critical request context. A single-time historical response must not be relabelled an as-known-at result. Historical evidence needs authoritative recording-time provenance and sufficient retained coverage; unsupported profile negotiation must fail closed.

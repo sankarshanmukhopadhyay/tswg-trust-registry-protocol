@@ -10,3 +10,23 @@ test('non-authoritative historical evidence cannot establish past validity', () 
 test('incomplete historical evidence cannot establish past validity', () => { const result = evaluateHistoricalMaterial(materialId, [assertion({ complete_for_scope: false })], '2026-06-01T00:00:00Z'); assert.equal(result.decision, HISTORICAL_DECISIONS.INDETERMINATE); assert.equal(result.reason, HISTORICAL_REASONS.INCOMPLETE); });
 test('rotation establishes different states at different historical times', () => { const before = assertion({ effective_until: '2026-04-01T00:00:00Z' }); const after = assertion({ state: HISTORICAL_STATES.SUPERSEDED, effective_from: '2026-04-01T00:00:00Z', effective_until: undefined, evidence_digest: 'sha256:c1-superseded' }); assert.equal(evaluateHistoricalMaterial(materialId, [before, after], '2026-03-15T00:00:00Z').historical_state, HISTORICAL_STATES.VALID); assert.equal(evaluateHistoricalMaterial(materialId, [before, after], '2026-04-15T00:00:00Z').historical_state, HISTORICAL_STATES.SUPERSEDED); });
 test('historical material result does not itself assert principal authorization or recognition', () => { const result = evaluateHistoricalMaterial(materialId, [assertion()], '2026-06-01T00:00:00Z'); assert.equal(Object.hasOwn(result, 'authorized'), false); assert.equal(Object.hasOwn(result, 'recognized'), false); });
+
+const original = assertion({source_id:'urn:record:old', recorded_at:'2026-01-10T00:00:00Z', effective_until:undefined});
+const correction = assertion({source_id:'urn:record:new', recorded_at:'2026-02-20T00:00:00Z', state:HISTORICAL_STATES.REVOKED, effective_until:undefined, supersedes_source_id:'urn:record:old'});
+test('contemporary and retrospective evidence cutoffs produce distinct outcomes', () => {
+  const assertions=[original,correction];
+  assert.equal(evaluateHistoricalMaterial(materialId,assertions,'2026-01-15T00:00:00Z','2026-01-15T00:00:00Z').decision,HISTORICAL_DECISIONS.POSITIVE);
+  assert.equal(evaluateHistoricalMaterial(materialId,assertions,'2026-01-15T00:00:00Z','2026-11-10T00:00:00Z').decision,HISTORICAL_DECISIONS.AUTHORITATIVE_NEGATIVE);
+});
+test('uncorrected retroactive conflict remains indeterminate', () => {
+  assert.equal(evaluateHistoricalMaterial(materialId,[original,{...correction,supersedes_source_id:undefined}],'2026-01-15T00:00:00Z','2026-11-10T00:00:00Z').decision,HISTORICAL_DECISIONS.INDETERMINATE);
+});
+test('missing authoritative recording timestamp cannot establish as-known-at state', () => {
+  assert.equal(evaluateHistoricalMaterial(materialId,[assertion()],'2026-01-15T00:00:00Z','2026-01-15T00:00:00Z').reason,HISTORICAL_REASONS.RECORDING_TIME_MISSING);
+});
+test('dangling supersession cannot establish retrospective revocation', () => {
+  assert.equal(evaluateHistoricalMaterial(materialId,[correction],'2026-01-15T00:00:00Z','2026-11-10T00:00:00Z').reason,HISTORICAL_REASONS.INVALID_SUPERSESSION);
+});
+test('evidence cutoff must not precede subject time', () => {
+  assert.throws(()=>evaluateHistoricalMaterial(materialId,[original],'2026-01-15T00:00:00Z','2026-01-14T00:00:00Z'),RangeError);
+});

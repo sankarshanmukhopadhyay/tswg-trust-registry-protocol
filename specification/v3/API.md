@@ -26,6 +26,7 @@ Evaluates one exact proposition.
 | `action` | string | yes | Bounded action relevant to the proposition. | Changing action changes the proposition and requires re-evaluation. |
 | `resource` | string | yes | Bounded resource/object relevant to the proposition. | Changing resource changes the proposition and requires re-evaluation. |
 | `context` | object | conditional | Additional decision-relevant values. | Members declared in `critical_context` become mandatory processing semantics. Unknown non-critical members may be handled by the negotiated profile/binding. |
+| `context.effective_at` / `context.evidence_as_of` | RFC 3339 date-time | conditional | Bitemporal historical subject and evidence-cutoff coordinates. | Must both be critical and require the `bitemporal-history` processing profile. |
 | `context.time` | RFC 3339 date-time | no | Time supplied as contextual input. | Do not confuse with the candidate evaluation-time contract when an implementation exposes that separately. |
 | `context.verification_material` | string | conditional | Exact key/certificate/material qualifier for material-bound evaluation. | Required when `verification_material` is critical. A mismatch MUST NOT fall back to principal-only positive. |
 | `critical_context` | array[string] | no | Names of context members whose semantics cannot be ignored. | Unsupported critical semantics fail closed; they MUST NOT be dropped to obtain an answer. |
