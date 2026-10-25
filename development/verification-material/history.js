@@ -12,7 +12,9 @@ const HISTORICAL_REASONS = Object.freeze({
   NO_COVERING_EVIDENCE: 'no-covering-historical-evidence',
   CONFLICTING_EVIDENCE: 'conflicting-historical-evidence',
   NON_AUTHORITATIVE: 'historical-source-non-authoritative',
-  INCOMPLETE: 'historical-source-incomplete'
+  INCOMPLETE: 'historical-source-incomplete',
+  RECORDING_TIME_MISSING: 'historical-recording-time-missing',
+  INVALID_SUPERSESSION: 'historical-supersession-invalid'
 });
 
 const HISTORICAL_STATES = Object.freeze({
@@ -34,6 +36,7 @@ function createHistoricalAssertion(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new TypeError('historical assertion must be an object');
   if (!Object.values(HISTORICAL_STATES).includes(input.state)) throw new TypeError(`unsupported historical state: ${input.state}`);
   const from = parseTime(input.effective_from, 'effective_from');
+  const recorded = input.recorded_at === undefined ? undefined : parseTime(input.recorded_at, 'recorded_at');
   const until = input.effective_until ? parseTime(input.effective_until, 'effective_until') : undefined;
   if (until && until <= from) throw new TypeError('effective_until must be later than effective_from');
   return Object.freeze({
@@ -42,6 +45,8 @@ function createHistoricalAssertion(input) {
     effective_from: from.toISOString(),
     ...(until ? { effective_until: until.toISOString() } : {}),
     source_id: input.source_id,
+    ...(recorded ? { recorded_at: recorded.toISOString() } : {}),
+    ...(input.supersedes_source_id ? { supersedes_source_id: input.supersedes_source_id } : {}),
     authoritative: input.authoritative === true,
     complete_for_scope: input.complete_for_scope === true,
     ...(input.evidence_digest ? { evidence_digest: input.evidence_digest } : {})
@@ -55,30 +60,47 @@ function covers(assertion, at) {
   return t >= from && (!until || t < until);
 }
 
-function evaluateHistoricalMaterial(materialId, assertions, at) {
+function evaluateHistoricalMaterial(materialId, assertions, at, evidenceAsOf) {
   if (typeof materialId !== 'string' || materialId.trim() === '') throw new TypeError('verification_material_id must be a non-empty string');
   if (!Array.isArray(assertions)) throw new TypeError('assertions must be an array');
   const evaluation = parseTime(at, 'evaluation_time');
   const normalized = assertions.map(createHistoricalAssertion).filter((entry) => entry.verification_material_id === materialId);
-  const covering = normalized.filter((entry) => covers(entry, evaluation.toISOString()));
+  const cutoff = evidenceAsOf === undefined ? undefined : parseTime(evidenceAsOf, 'evidence_as_of');
+  if (cutoff && cutoff < evaluation) throw new RangeError('evidence_as_of must not precede evaluation time');
+  const relevant = normalized.filter((entry) => covers(entry, evaluation.toISOString()));
+  if (cutoff && relevant.some((entry) => !entry.recorded_at)) {
+    return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.RECORDING_TIME_MISSING, materialId, evaluation, [], undefined, cutoff);
+  }
+  const eligible = cutoff ? relevant.filter((entry) => new Date(entry.recorded_at) <= cutoff) : relevant;
+  const superseded = new Set();
+  for (const entry of eligible) {
+    if (!entry.supersedes_source_id) continue;
+    const prior = eligible.find((candidate) => candidate !== entry && candidate.source_id === entry.supersedes_source_id);
+    if (!prior || !entry.recorded_at || !prior.recorded_at || new Date(prior.recorded_at) >= new Date(entry.recorded_at) || !entry.authoritative || !prior.authoritative) {
+      return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.INVALID_SUPERSESSION, materialId, evaluation, eligible, undefined, cutoff);
+    }
+    superseded.add(prior.source_id);
+  }
+  const covering = eligible.filter((entry) => !superseded.has(entry.source_id));
 
-  if (covering.length === 0) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.NO_COVERING_EVIDENCE, materialId, evaluation, []);
-  if (covering.some((entry) => !entry.authoritative)) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.NON_AUTHORITATIVE, materialId, evaluation, covering);
-  if (covering.some((entry) => !entry.complete_for_scope)) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.INCOMPLETE, materialId, evaluation, covering);
+  if (covering.length === 0) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.NO_COVERING_EVIDENCE, materialId, evaluation, [], undefined, cutoff);
+  if (covering.some((entry) => !entry.authoritative)) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.NON_AUTHORITATIVE, materialId, evaluation, covering, undefined, cutoff);
+  if (covering.some((entry) => !entry.complete_for_scope)) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.INCOMPLETE, materialId, evaluation, covering, undefined, cutoff);
 
   const states = [...new Set(covering.map((entry) => entry.state))];
-  if (states.length !== 1) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.CONFLICTING_EVIDENCE, materialId, evaluation, covering);
+  if (states.length !== 1) return result(HISTORICAL_DECISIONS.INDETERMINATE, HISTORICAL_REASONS.CONFLICTING_EVIDENCE, materialId, evaluation, covering, undefined, cutoff);
 
   if (states[0] === HISTORICAL_STATES.VALID) {
-    return result(HISTORICAL_DECISIONS.POSITIVE, HISTORICAL_REASONS.STATE_ESTABLISHED, materialId, evaluation, covering, states[0]);
+    return result(HISTORICAL_DECISIONS.POSITIVE, HISTORICAL_REASONS.STATE_ESTABLISHED, materialId, evaluation, covering, states[0], cutoff);
   }
-  return result(HISTORICAL_DECISIONS.AUTHORITATIVE_NEGATIVE, HISTORICAL_REASONS.STATE_NEGATIVE, materialId, evaluation, covering, states[0]);
+  return result(HISTORICAL_DECISIONS.AUTHORITATIVE_NEGATIVE, HISTORICAL_REASONS.STATE_NEGATIVE, materialId, evaluation, covering, states[0], cutoff);
 }
 
-function result(decision, reason, materialId, evaluation, evidence, state) {
+function result(decision, reason, materialId, evaluation, evidence, state, cutoff) {
   return Object.freeze({
     verification_material_id: materialId,
     evaluation_time: evaluation.toISOString(),
+    ...(cutoff ? { evidence_as_of: cutoff.toISOString() } : {}),
     decision,
     reason,
     ...(state ? { historical_state: state } : {}),

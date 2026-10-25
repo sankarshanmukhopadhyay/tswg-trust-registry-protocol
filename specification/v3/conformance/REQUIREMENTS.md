@@ -17,6 +17,12 @@ This register assigns stable downstream identifiers to the candidate's release-s
 | TRQP3-ACT-004 | Action Identifier Profile §5/§7 | EKU-in-action does not imply certificate EKU presence/validity or TRQP authorization; certificate EKU presence/validity does not imply TRQP authorization. | EKU non-inference negative vectors |
 | TRQP3-ACT-005 | Action Identifier Profile §2/§7 | Unknown/unsupported/differently serialized actions are not silently aliased, broadened or rewritten without explicit negotiated equivalence. | exact-identifier/no-alias tests |
 | TRQP3-CTX-001 | 3.3 | Supported critical members are evaluated under the processing contract; unsupported critical semantics resolve indeterminate/non-positive. | unsupported-critical-context vector |
+| TRQP3-TIME-001 | 4.1 | Distinguish effective time and authoritative recording/cutoff time. | bitemporal differential tests |
+| TRQP3-TIME-002 | 4.1 | Exclude assertions first recorded after evidence cutoff. | contemporary cutoff test |
+| TRQP3-TIME-003 | 4.1 | Retroactive determinations must not rewrite earlier as-known-at answers. | retrospective cutoff test |
+| TRQP3-TIME-004 | 4.1 | Require authoritative explicit supersession to resolve effective conflicts. | correction/conflict tests |
+| TRQP3-TIME-005 | 4.1 | Missing recording/history evidence is indeterminate. | timestamp and correction negative tests |
+| TRQP3-TIME-006 | 4.1 | Bitemporal wire semantics are decision-critical and negotiated. | profile/critical-context schema tests |
 | TRQP3-LIFE-001 | 4 | Material lifecycle is evaluated independently from principal lifecycle. | revocation/expiry/supersession vectors |
 | TRQP3-LIFE-002 | 4 | Current state is not projected backwards for historical evaluation. | historical-before-revocation vector |
 | TRQP3-LIFE-003 | 4 | Insufficient historical evidence resolves indeterminate. | historical evidence-gap vector |

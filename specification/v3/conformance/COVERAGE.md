@@ -10,6 +10,7 @@ This matrix links stable candidate requirement families to executable evidence. 
 | TRQP3-MAT-* | material-bound evaluation tests | identity/authority separation | covered |
 | TRQP3-ACT-* | action-identifier helper + `tests/action-identifiers.test.js` | exact action purpose remains independent of material validity/identity | covered-local |
 | TRQP3-CTX-* | critical-context/conformance tests | unsupported delegation context | covered |
+| TRQP3-TIME-* | `tests/historical-evaluation.test.js`; effective-time/cutoff correction vectors; temporal schema fields | historical attribution and correction non-rewrite | covered-local; authoritative record completeness remains an external input |
 | TRQP3-LIFE-* | lifecycle/historical tests | expiry, revocation, historical-before-revocation | covered |
 | TRQP3-EVID-* | evidence/conformance tests | capability-only, stale/revoked evidence boundaries | covered |
 | TRQP3-DEC-* | conformance vectors | non-positive delegated outcomes | covered |

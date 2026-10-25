@@ -149,6 +149,16 @@ If evidence sufficient to establish historical state is missing, conflicting, st
 
 A conforming implementation therefore needs a lifecycle model capable of answering “what was true at time T?” separately from “what is true now?”. A revocation at T2 does not by itself prove that the material was invalid at T1; similarly, evidence of current validity does not prove historical validity if the relevant historical interval cannot be established.
 
+### 4.1 Bitemporal historical evidence
+
+**Effective time** (`effective_at`) identifies the historical subject time. **Evidence cutoff** (`evidence_as_of`) limits eligible authoritative assertions to those recorded no later than the cutoff. `recorded_at` identifies authoritative recording/publication, not local observation. These times are independent. [`TRQP3-TIME-001`]
+
+A processor supporting the optional `bitemporal-history` profile **MUST** evaluate the same bounded proposition with both temporal coordinates and **MUST NOT** use assertions recorded after the evidence cutoff. A later authoritative retroactive determination MAY establish earlier effective state but **MUST NOT** rewrite an earlier as-known-at evaluation. [`TRQP3-TIME-002`, `TRQP3-TIME-003`]
+
+An effective-dated correction displacing a conflicting prior assertion requires explicit, authoritative supersession evidence. Without it conflicting claims remain `indeterminate`. Missing recording timestamps, incomplete record coverage, or unavailable authoritative history **MUST NOT** be interpreted as positive or authoritative negative. [`TRQP3-TIME-004`, `TRQP3-TIME-005`]
+
+An HTTP consumer requesting bitemporal semantics MUST mark `effective_at` and `evidence_as_of` critical and require negotiation of `bitemporal-history`; unsupported critical semantics MUST fail closed rather than degrade into single-time history. Neither historical archiving nor adjudication of commercial reliance is required of all core processors. [`TRQP3-TIME-006`]
+
 ## 5. Evidence semantics
 
 ### 5.1 Evidence sufficiency

@@ -3,30 +3,70 @@
   "$id": "https://example.invalid/trqp/wp7-request.schema.json",
   "title": "Downstream candidate TRQP qualified request",
   "type": "object",
-  "required": ["trqp_version", "entity_id", "authority_id", "action", "resource"],
+  "required": [
+    "trqp_version",
+    "entity_id",
+    "authority_id",
+    "action",
+    "resource"
+  ],
   "properties": {
-    "trqp_version": { "const": "3.0-candidate" },
-    "entity_id": { "type": "string", "minLength": 1 },
-    "authority_id": { "type": "string", "minLength": 1 },
-    "action": { "type": "string", "minLength": 1 },
-    "resource": { "type": "string", "minLength": 1 },
+    "trqp_version": {
+      "const": "3.0-candidate"
+    },
+    "entity_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resource": {
+      "type": "string",
+      "minLength": 1
+    },
     "context": {
       "type": "object",
       "properties": {
-        "time": { "type": "string", "format": "date-time" },
-        "verification_material": { "type": "string", "minLength": 1 }
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verification_material": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effective_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evidence_as_of": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
       "additionalProperties": true
     },
     "critical_context": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "required_profiles": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   },
   "allOf": [
@@ -34,30 +74,106 @@
       "if": {
         "properties": {
           "critical_context": {
-            "contains": { "const": "verification_material" }
+            "contains": {
+              "const": "verification_material"
+            }
           }
         },
-        "required": ["critical_context"]
+        "required": [
+          "critical_context"
+        ]
       },
       "then": {
-        "required": ["context"],
+        "required": [
+          "context"
+        ],
         "properties": {
-          "context": { "required": ["verification_material"] }
+          "context": {
+            "required": [
+              "verification_material"
+            ]
+          }
         }
       }
     },
     {
       "if": {
         "properties": {
-          "context": { "required": ["verification_material"] }
+          "context": {
+            "required": [
+              "verification_material"
+            ]
+          }
         },
-        "required": ["context"]
+        "required": [
+          "context"
+        ]
       },
       "then": {
-        "required": ["critical_context"],
+        "required": [
+          "critical_context"
+        ],
         "properties": {
           "critical_context": {
-            "contains": { "const": "verification_material" }
+            "contains": {
+              "const": "verification_material"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "context"
+        ],
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "required": [
+                  "effective_at"
+                ]
+              },
+              {
+                "required": [
+                  "evidence_as_of"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "critical_context",
+          "required_profiles"
+        ],
+        "properties": {
+          "context": {
+            "required": [
+              "effective_at",
+              "evidence_as_of"
+            ]
+          },
+          "critical_context": {
+            "allOf": [
+              {
+                "contains": {
+                  "const": "effective_at"
+                }
+              },
+              {
+                "contains": {
+                  "const": "evidence_as_of"
+                }
+              }
+            ]
+          },
+          "required_profiles": {
+            "contains": {
+              "const": "bitemporal-history"
+            }
           }
         }
       }

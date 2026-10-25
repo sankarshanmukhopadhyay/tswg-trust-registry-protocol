@@ -88,6 +88,12 @@ components:
             time:
               type: string
               format: date-time
+            effective_at:
+              type: string
+              format: date-time
+            evidence_as_of:
+              type: string
+              format: date-time
             verification_material:
               type: string
               minLength: 1
@@ -128,6 +134,24 @@ components:
               critical_context:
                 contains:
                   const: verification_material
+        - if:
+            required: [context]
+            properties:
+              context:
+                anyOf:
+                  - required: [effective_at]
+                  - required: [evidence_as_of]
+          then:
+            required: [critical_context, required_profiles]
+            properties:
+              context:
+                required: [effective_at, evidence_as_of]
+              critical_context:
+                allOf:
+                  - contains: { const: effective_at }
+                  - contains: { const: evidence_as_of }
+              required_profiles:
+                contains: { const: bitemporal-history }
     SemanticResponse:
       type: object
       required: [decision, reason, evaluation_time, evidence_state]
@@ -144,6 +168,12 @@ components:
           type: [boolean, 'null']
           description: Direct recognition only unless an explicit future propagation rule applies.
         evaluation_time:
+          type: string
+          format: date-time
+        effective_at:
+          type: string
+          format: date-time
+        evidence_as_of:
           type: string
           format: date-time
         evidence_state:
@@ -172,6 +202,9 @@ components:
           type: boolean
         complete_for_scope:
           type: boolean
+        recorded_at:
+          type: string
+          format: date-time
         effective_from:
           type: string
           format: date-time
@@ -220,6 +253,9 @@ components:
           items: { type: string }
 
           description: Algorithm-qualified opaque binding; not proof of authority or authenticity by itself.
+        recorded_at:
+          type: string
+          format: date-time
         effective_from:
           type: string
           format: date-time
