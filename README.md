@@ -61,3 +61,7 @@ A further area about establishing a "query language" emerged from the efforts in
 ## Downstream authority-at-commitment assessment
 
 An informative downstream assessment of how current TRQP query semantics can contribute to, but do not themselves establish, action-specific commitment authority is available at [review-process/authority-at-commitment-resolution.md](review-process/authority-at-commitment-resolution.md). It does not amend the upstream specification.
+
+## Approved-v2 publication integrity
+
+Run `node --test tests/approved-publication.test.js` to check the approved API schema insert targets, pinned upstream schema bytes and compatibility copies. This is a downstream publication-integrity check, not endpoint conformance or an amendment to the approved contract. See [the evidence scope](review-process/approved-v2-publication-integrity.md).

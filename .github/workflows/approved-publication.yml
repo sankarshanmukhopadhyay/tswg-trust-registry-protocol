@@ -1,0 +1,23 @@
+name: Approved publication integrity
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/approved-publication.test.js
+      - run: npm install
+      - run: npm run render
+      - run: test -s dist/approved/index.html && test -s dist/draft/index.html
